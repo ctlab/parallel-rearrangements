@@ -61,8 +61,11 @@ And folders `characters`, `trees` with character in rendered `.pdf` tree and `.c
 
 
 ## Example
-Code must be with `PYTHONPATH` in root of the project. Example line:
-```PYTHONPATH=. python3 src/main.py -t example-data/e_coli/input/tree.nwk -b example-data/e_coli/input/maf2synteny-output -o example-data/e_coli/output -l example-data/e_coli/input/labels.csv```
+Code must be with `PYTHONPATH` in root of the project. 
+Running on example input:
+```
+PYTHONPATH=. python3 src/main.py -t example-data/e_coli/input/tree.nwk -b example-data/e_coli/input/maf2synteny-output -o example-data/e_coli/output -l example-data/e_coli/input/labels.csv
+```
 
 #### Example output
 ```
