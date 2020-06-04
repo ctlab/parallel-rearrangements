@@ -19,7 +19,7 @@ def distance_between_blocks_dict(df_blocks, genome_length):
     df_blocks['real_end'] = df_blocks.apply(lambda row: row.chr_beg if row.orientation == '-' else row.chr_end, axis=1)
 
     for i, (strain, df_strain) in enumerate(df_blocks.groupby('species')):
-        print(strain, i, 'of', len(df_blocks['species'].unique()))
+        # print(strain, i, 'of', len(df_blocks['species'].unique()))
         l = genome_length[strain]
 
         xs = df_strain[['block', 'real_beg', 'real_end']].to_numpy()

@@ -15,7 +15,7 @@ from src.clustering.clustering import clustering, split_by_cluster
 
 from src.utils.data.converters import block_coords_to_infercars
 from src.utils.data.parsers import genome_lengths_from_block_coords, parse_infercars_to_df, \
-    get_genomes_contain_blocks_grimm
+    get_genomes_contain_blocks_grimm, make_labels_dict
 from src.utils.data.unique_gene_filters import grimm_filter_unique_gene
 from src.utils.data.stats import distance_between_blocks_dict, check_stats_stains
 
@@ -31,7 +31,8 @@ parser.add_argument('--tree', '-t', required=True, help='Tree in newick format, 
                                                         'You can read more about formats supported by ete3 at http://etetoolkit.org/docs/latest/tutorial/tutorial_trees.html#reading-and-writing-newick-trees')
 parser.add_argument('--blocks_folder', '-b', required=True,
                     help='Path to folder with blocks resulted as output of original Sibelia or maf2synteny tool.')
-parser.add_argument('--output', '-o', required=True, help='Path to output folder')
+parser.add_argument('--labels', '-l', default='', help='Path to csv file with tree labels, must contain two columns: `strain` and `label`.')
+parser.add_argument('--output', '-o', required=True, help='Path to output folder.')
 
 show_branch_support = True
 clustering_proximity_percentile = 25
@@ -69,12 +70,13 @@ def parsers_and_stats():
 
     genome_lengths = genome_lengths_from_block_coords(blocks_folder + BLOCKS_COORD_FILENAME)
     blocks_df = parse_infercars_to_df(preprocessed_data_folder + INFERCARS_FILENAME)
-    tree_holder = TreeHolder(tree_file)
+    tree_holder = TreeHolder(tree_file, labels_dict=make_labels_dict(labels_file))
 
     distance_between_blocks = distance_between_blocks_dict(blocks_df, genome_lengths)
     genomes, blocks, block_genome_count = get_genomes_contain_blocks_grimm(blocks_folder + GRIMM_FILENAME)
 
     genomes = check_stats_stains(tree_holder, genomes)
+
 
 @decorate("Balanced rearrangements characters")
 def balanced_rearrangements_characters():
@@ -167,7 +169,7 @@ def unbalanced_rearrangements_output():
 if __name__ == "__main__":
     start_time = time()
     d = vars(parser.parse_args())
-    blocks_folder, output_folder, tree_file = d['blocks_folder'], d['output'], d['tree']
+    blocks_folder, output_folder, tree_file, labels_file = d['blocks_folder'], d['output'], d['tree'], d['labels']
 
     # folders
     if blocks_folder[:-1] != '/': blocks_folder += '/'
