@@ -36,8 +36,9 @@ def call_unique_characters(cls_chars, cls_stats):
 
 
 def write_characters_csv_unbalanced(unique_chars_list, folder):
+    fill_length = len(str(len(unique_chars_list)))
     for cl, unique_chars in enumerate(unique_chars_list):
-        cl_folder = folder + f'cluster_{cl}/'
+        cl_folder = folder + f'cluster_{str(cl).zfill(fill_length)}/'
         os.makedirs(cl_folder, exist_ok=True)
         for unique_char, unique_count_blocks in unique_chars.items():
             # unfrozen = dict(unique_char)
@@ -50,8 +51,9 @@ def write_characters_csv_unbalanced(unique_chars_list, folder):
                 wtr.writerows(rows)
 
 def write_trees_unbalanced(unique_chars_list, folder, show_branch_support, tree_holder, colors):
+    fill_length = len(str(len(unique_chars_list)))
     for cl, unique_chars in enumerate(unique_chars_list):
-        cl_folder = folder + f'cluster_{cl}/'
+        cl_folder = folder + f'cluster_{str(cl).zfill(fill_length)}/'
         os.makedirs(cl_folder, exist_ok=True)
 
         for unique_char, unique_count_blocks in unique_chars.items():

@@ -12,14 +12,19 @@ def distance_between_blocks_distribution(df_blocks):
     return ds
 
 
-def distance_between_blocks_dict(df_blocks, genome_length):
+def distance_between_blocks_dict(df_blocks, genome_length, allowed_blocks=None):
     distances = defaultdict(lambda: defaultdict(lambda: 1e12))
 
-    df_blocks['real_beg'] = df_blocks.apply(lambda row: row.chr_beg if row.orientation == '+' else row.chr_end, axis=1)
-    df_blocks['real_end'] = df_blocks.apply(lambda row: row.chr_beg if row.orientation == '-' else row.chr_end, axis=1)
+    if allowed_blocks is None:
+        df = df_blocks.copy()
+    else:
+        df = df_blocks.loc[df_blocks['block'].isin(allowed_blocks)].copy()
 
-    for i, (strain, df_strain) in enumerate(df_blocks.groupby('species')):
-        # print(strain, i, 'of', len(df_blocks['species'].unique()))
+    df['real_beg'] = df.apply(lambda row: row.chr_beg if row.orientation == '+' else row.chr_end, axis=1)
+    df['real_end'] = df.apply(lambda row: row.chr_beg if row.orientation == '-' else row.chr_end, axis=1)
+
+    for i, (strain, df_strain) in enumerate(df.groupby('species')):
+        # print(strain, i, 'of', len(df['species'].unique()))
         l = genome_length[strain]
 
         xs = df_strain[['block', 'real_beg', 'real_end']].to_numpy()
@@ -51,7 +56,6 @@ def check_stats_stains(tree, block_genomes):
     print('Strains in blocks file count:', len(block_genomes))
     print('Strains in tree leafs count:', len(tree_genomes))
     print('Intersected strains count:', len(block_genomes & tree_genomes))
-    print()
 
     if not len(block_genomes & tree_genomes) == len(tree_genomes) == len(block_genomes):
         if len(block_genomes & tree_genomes) == 0:

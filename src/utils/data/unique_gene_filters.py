@@ -51,6 +51,8 @@ def grimm_filter_unique_gene(in_file, out_file):
             else:
                 i += 1
 
+    return list(map(int, flt.allowed_blocks))
+
 def filter_dataframe(df):
     allowed_blocks = set()
     all_sp = len(df['species'].unique())

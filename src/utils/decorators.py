@@ -8,14 +8,14 @@ def decorate(module_name):
         def wrapper(*args, **kwargs):
             start = time.time()
 
-            print('Running module:', module_name)
-            print(sep, '| Started')
+            print(f'<Running module: {module_name}>')
+            print(sep, '')
             return_value = func(*args, **kwargs)
 
             end = time.time()
 
-            print(sep, '| Ended')
-            print(f'Elapsed {end - start} seconds')
+            print(sep, '')
+            print(f'<Module finished: {module_name}>, elapsed {end - start} seconds')
             print()
             print()
             return return_value

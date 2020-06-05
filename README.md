@@ -69,67 +69,69 @@ PYTHONPATH=. python3 src/main.py -t example-data/e_coli/input/tree.nwk -b exampl
 
 #### Example output
 ```
-Running module: Preprocess Data
--------------------------------------------------------------------------------- | Started
--------------------------------------------------------------------------------- | Ended
-Elapsed 11.466776847839355 seconds
+<Running module: Preprocess Data>
+-------------------------------------------------------------------------------- 
+Converting block coords to infercars format
+-------------------------------------------------------------------------------- 
+<Module finished: Preprocess Data>, elapsed 8.155789852142334 seconds
 
 
-Running module: Parsers and stats
--------------------------------------------------------------------------------- | Started
+<Running module: Parsers and stats>
+-------------------------------------------------------------------------------- 
 Strains in blocks file count: 414
 Strains in tree leafs count: 414
 Intersected strains count: 414
+-------------------------------------------------------------------------------- 
+<Module finished: Parsers and stats>, elapsed 0.5608758926391602 seconds
 
--------------------------------------------------------------------------------- | Ended
-Elapsed 40.43092107772827 seconds
 
-
-Running module: Balanced rearrangements characters
--------------------------------------------------------------------------------- | Started
+<Running module: Balanced rearrangements characters>
+-------------------------------------------------------------------------------- 
 Breakpoint graph parsed
 Getting characters from breakpoint graph component, size=66
--------------------------------------------------------------------------------- | Ended
-Elapsed 38.95164895057678 seconds
+-------------------------------------------------------------------------------- 
+<Module finished: Balanced rearrangements characters>, elapsed 27.029563188552856 seconds
 
 
-Running module: Balanced rearrangements stats
--------------------------------------------------------------------------------- | Started
+<Running module: Balanced rearrangements stats>
+-------------------------------------------------------------------------------- 
+Counting distances between unique one-copy blocks, may take a while
 Got characters after breakpoint graph consideration: 33
 Left non-convex characters after filtering: 26
--------------------------------------------------------------------------------- | Ended
-Elapsed 3.766929864883423 seconds
+-------------------------------------------------------------------------------- 
+<Module finished: Balanced rearrangements stats>, elapsed 7.653030157089233 seconds
 
 
-Running module: Balanced rearrangements output
--------------------------------------------------------------------------------- | Started
--------------------------------------------------------------------------------- | Ended
-Elapsed 38.575997829437256 seconds
+<Running module: Balanced rearrangements output>
+-------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------- 
+<Module finished: Balanced rearrangements output>, elapsed 27.654157876968384 seconds
 
 
-Running module: Unbalanced rearrangements characters
--------------------------------------------------------------------------------- | Started
--------------------------------------------------------------------------------- | Ended
-Elapsed 0.06099104881286621 seconds
+<Running module: Unbalanced rearrangements characters>
+-------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------- 
+<Module finished: Unbalanced rearrangements characters>, elapsed 0.05320596694946289 seconds
 
 
-Running module: Unbalanced rearrangements stats and clustering
--------------------------------------------------------------------------------- | Started
+<Running module: Unbalanced rearrangements stats and clustering>
+-------------------------------------------------------------------------------- 
 Got characters after copy number variation consideration: 409
 Left non-convex characters after filtering: 261
+Counting distances between non-convex character blocks, may take a while
 Jaccard index matrix constructed
 Proximity matrix constructed
 Clustring is done
 Clusters: 86
--------------------------------------------------------------------------------- | Ended
-Elapsed 11.854557991027832 seconds
+-------------------------------------------------------------------------------- 
+<Module finished: Unbalanced rearrangements stats and clustering>, elapsed 16.02768898010254 seconds
 
 
-Running module: Unbalanced rearrangements output
--------------------------------------------------------------------------------- | Started
--------------------------------------------------------------------------------- | Ended
-Elapsed 286.7173981666565 seconds
+<Running module: Unbalanced rearrangements output>
+-------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------- 
+<Module finished: Unbalanced rearrangements output>, elapsed 214.91788911819458 seconds
 
 
-Process finished with exit code 0
+Total elapsed time: 302.05323600769043
 ```

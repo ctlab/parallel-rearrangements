@@ -5,6 +5,7 @@ import numpy as np
 
 from time import time
 from itertools import takewhile
+from operator import itemgetter
 
 from src.characters.balanced import get_characters, write_characters_csv_balanced, get_characters_stats_balanced, \
     write_trees_balanced, write_stats_csv_balanced
@@ -60,19 +61,20 @@ UNBALANCED_COLORS = ['Gainsboro', 'White'] + BALANCED_COLORS[2:]
 
 @decorate("Preprocess Data")
 def preprocess_data():
-    grimm_filter_unique_gene(blocks_folder + GRIMM_FILENAME, preprocessed_data_folder + UNIQUE_GRIMM_FILENAME)
+    global unique_blocks
+    unique_blocks = grimm_filter_unique_gene(blocks_folder + GRIMM_FILENAME, preprocessed_data_folder + UNIQUE_GRIMM_FILENAME)
+    print('Converting block coords to infercars format')
     block_coords_to_infercars(blocks_folder + BLOCKS_COORD_FILENAME, preprocessed_data_folder + INFERCARS_FILENAME)
 
 
 @decorate("Parsers and stats")
 def parsers_and_stats():
-    global genome_lengths, blocks_df, tree_holder, distance_between_blocks, genomes, blocks, block_genome_count
+    global genome_lengths, blocks_df, tree_holder, genomes, blocks, block_genome_count
 
     genome_lengths = genome_lengths_from_block_coords(blocks_folder + BLOCKS_COORD_FILENAME)
     blocks_df = parse_infercars_to_df(preprocessed_data_folder + INFERCARS_FILENAME)
     tree_holder = TreeHolder(tree_file, labels_dict=make_labels_dict(labels_file))
 
-    distance_between_blocks = distance_between_blocks_dict(blocks_df, genome_lengths)
     genomes, blocks, block_genome_count = get_genomes_contain_blocks_grimm(blocks_folder + GRIMM_FILENAME)
 
     genomes = check_stats_stains(tree_holder, genomes)
@@ -86,8 +88,10 @@ def balanced_rearrangements_characters():
 @decorate("Balanced rearrangements stats")
 def balanced_rearrangements_stats():
     global b_characters, b_stats
-
-    b_stats = get_characters_stats_balanced(b_characters, tree_holder, distance_between_blocks)
+    
+    print('Counting distances between unique one-copy blocks, may take a while')
+    distance_between_uniq_blocks = distance_between_blocks_dict(blocks_df, genome_lengths, unique_blocks)
+    b_stats = get_characters_stats_balanced(b_characters, tree_holder, distance_between_uniq_blocks)
     char_stats = zip(b_characters, b_stats)
 
     print('Got characters after breakpoint graph consideration:', len(b_characters))
@@ -142,6 +146,8 @@ def unbalanced_rearrangements_stats_and_clustering():
     ub_characters = [char for char, stat in char_stats]
     ub_stats = [stat for char, stat in char_stats]
 
+    print('Counting distances between non-convex character blocks, may take a while')
+    distance_between_blocks = distance_between_blocks_dict(blocks_df, genome_lengths, set(map(itemgetter(0), ub_stats)))
     ub_cls = clustering(ub_characters, ub_stats, distance_between_blocks, max(genome_lengths.values()),
                         clustering_threshold, clustering_j, clustering_b, clustering_proximity_percentile)
 
@@ -188,3 +194,5 @@ if __name__ == "__main__":
     unbalanced_rearrangements_characters()
     unbalanced_rearrangements_stats_and_clustering()
     unbalanced_rearrangements_output()
+
+    print('Total elapsed time:', time() - start_time)
