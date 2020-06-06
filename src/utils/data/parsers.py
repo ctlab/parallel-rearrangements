@@ -74,7 +74,7 @@ def get_genomes_contain_blocks_grimm(grimm_file):
             blocks.add(int(block))
             block_genome_count[int(block)][name] += 1
 
-    return genomes, list(sorted(blocks)), block_genome_count
+    return list(sorted(genomes)), list(sorted(blocks)), block_genome_count
 
 def make_labels_dict(file, row_from='strain', row_to='label'):
     try:
