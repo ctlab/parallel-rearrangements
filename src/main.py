@@ -67,7 +67,7 @@ def preprocess_data():
     block_coords_to_infercars(blocks_folder + BLOCKS_COORD_FILENAME, preprocessed_data_folder + INFERCARS_FILENAME)
 
 
-@decorate("Parsers and stats")
+@decorate("Parsers and check strains")
 def parsers_and_stats():
     global genome_lengths, blocks_df, tree_holder, genomes, blocks, block_genome_count
 
@@ -77,7 +77,7 @@ def parsers_and_stats():
 
     genomes, blocks, block_genome_count = get_genomes_contain_blocks_grimm(blocks_folder + GRIMM_FILENAME)
 
-    genomes = check_stats_stains(tree_holder, genomes)
+    genomes = check_stats_stains(tree_holder, set(genomes))
 
 
 @decorate("Balanced rearrangements characters")

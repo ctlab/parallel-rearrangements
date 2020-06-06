@@ -76,13 +76,13 @@ Converting block coords to infercars format
 <Module finished: Preprocess Data>, elapsed 8.155789852142334 seconds
 
 
-<Running module: Parsers and stats>
+<Running module: Parsers and check strains>
 -------------------------------------------------------------------------------- 
 Strains in blocks file count: 414
 Strains in tree leafs count: 414
 Intersected strains count: 414
 -------------------------------------------------------------------------------- 
-<Module finished: Parsers and stats>, elapsed 0.5608758926391602 seconds
+<Module finished: Parsers and check strains>, elapsed 0.5608758926391602 seconds
 
 
 <Running module: Balanced rearrangements characters>
