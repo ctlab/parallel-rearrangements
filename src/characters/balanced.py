@@ -14,13 +14,9 @@ get_colors_by_edge = lambda e: e.multicolor.multicolors
 def white_proportion(colors):
     return np.mean(list(map(lambda c: c == 0, colors)))
 
-def get_character_by_edge(bg, edge, genomes):
+def get_character_by_edge(bg, edge, genomes, neighbour_index):
     def get_neighbour_with_genome(v, genome):
-        for edge in bg.get_edges_by_vertex(BGVertex(v)):
-            # print(type(edge.vertex1), type(v))
-            assert str(edge.vertex1) == v
-            if get_colors_by_edge(edge)[BGGenome(genome)] == 1:
-                return edge.vertex2
+        return neighbour_index[(v, genome)]
 
     def get_genome_character_state_by_edge(genome):
         if cnt[BGGenome(genome)] == 1:
@@ -46,6 +42,16 @@ def get_character_by_edge(bg, edge, genomes):
     possible_edges = []
     return {genome: get_genome_character_state_by_edge(genome) for genome in genomes}, possible_edges
 
+def construct_vertex_genome_index(bg):
+    neighbour_index = {}
+    for v in bg.bg:
+        for edge in bg.get_edges_by_vertex(v):
+            colors = get_colors_by_edge(edge)
+            for color in colors:
+                neighbour_index[(str(v), color.name)] = edge.vertex2
+
+    return neighbour_index
+
 def get_characters(grimm_file, genomes):
     bg = GRIMMReader.get_breakpoint_graph(open(grimm_file))
     print('Breakpoint graph parsed')
@@ -59,11 +65,13 @@ def get_characters(grimm_file, genomes):
 
         print(f'Getting characters from breakpoint graph component, size={len(component_bg.bg)}')
 
+        neighbour_index = construct_vertex_genome_index(component_bg)
+
         for i_edge, edge in enumerate(component_bg.edges()):
             v1, v2 = edge.vertex1.name, edge.vertex2.name
             if v1 > v2: v1, v2 = v2, v1
 
-            genome_colors, neighbour_edges = get_character_by_edge(component_bg, edge, genomes)
+            genome_colors, neighbour_edges = get_character_by_edge(component_bg, edge, genomes, neighbour_index)
             if white_proportion(genome_colors.values()) < 0.5: continue
 
             labels = ['edge exists', 'parallel edge doesn\'t exist'] + [f'parallel edge {v1}-{v2}' for (v1, v2) in
