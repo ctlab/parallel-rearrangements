@@ -53,12 +53,12 @@ def grimm_filter_unique_gene(in_file, out_file):
 
     return list(map(int, flt.allowed_blocks))
 
-def filter_dataframe(df):
+def filter_dataframe_unique(df):
     allowed_blocks = set()
     all_sp = len(df['species'].unique())
     for block, df_block in df.groupby('block'):
         if len(df_block) == len(df_block['species'].unique()) == all_sp:
             allowed_blocks.add(block)
 
-    return df[df.apply(lambda x: x['block'] in allowed_blocks, axis=1)]
+    return df.loc[df['block'].isin(allowed_blocks)].copy()
 

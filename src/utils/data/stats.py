@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 from collections import defaultdict
 
@@ -41,11 +40,11 @@ def distance_between_blocks_dict(df_blocks, genome_length, allowed_blocks=None):
         for b1, st1, end1, b2, st2, end2 in combs:
             if b1 >= b2: continue
             distances[(b1, b2)][strain] = min(distances[(b1, b2)][strain],
-                                                      abs(end1 - st2),
-                                                      l - abs(end1 - st2),
-                                                      abs(end2 - st1),
-                                                      l - abs(end2 - st1)
-                                                      )
+                                              abs(end1 - st2),
+                                              l - abs(end1 - st2),
+                                              abs(end2 - st1),
+                                              l - abs(end2 - st1)
+                                              )
 
     return distances
 
@@ -76,3 +75,12 @@ def check_stats_stains(tree, block_genomes):
             print()
 
     return block_genomes & tree_genomes
+
+
+def get_coverages(df, genome_lengths):
+    return [sum(df_strain['chr_end'] - df_strain['chr_beg']) / genome_lengths[strain]
+            for strain, df_strain in df.groupby('species')]
+
+
+def get_mean_coverage(df, genome_lengths):
+    return np.mean(get_coverages(df, genome_lengths))

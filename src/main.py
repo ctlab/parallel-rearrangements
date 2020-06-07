@@ -17,8 +17,8 @@ from src.clustering.clustering import clustering, split_by_cluster
 from src.utils.data.converters import block_coords_to_infercars
 from src.utils.data.parsers import genome_lengths_from_block_coords, parse_infercars_to_df, \
     get_genomes_contain_blocks_grimm, make_labels_dict
-from src.utils.data.unique_gene_filters import grimm_filter_unique_gene
-from src.utils.data.stats import distance_between_blocks_dict, check_stats_stains
+from src.utils.data.unique_gene_filters import grimm_filter_unique_gene, filter_dataframe_unique
+from src.utils.data.stats import distance_between_blocks_dict, check_stats_stains, get_mean_coverage
 
 from src.utils.decorators import decorate
 
@@ -73,7 +73,17 @@ def parsers_and_stats():
 
     genome_lengths = genome_lengths_from_block_coords(blocks_folder + BLOCKS_COORD_FILENAME)
     blocks_df = parse_infercars_to_df(preprocessed_data_folder + INFERCARS_FILENAME)
+    unique_blocks_df = filter_dataframe_unique(blocks_df)
+
+    print('Blocks count:', len(blocks_df['block'].unique()))
+    print('Unique one-copy blocks count:', len(unique_blocks_df['block'].unique()))
+
+    print('Mean block coverage:', get_mean_coverage(blocks_df, genome_lengths) * 100, '%')
+    print('Mean unique one-copy blocks coverage:', get_mean_coverage(unique_blocks_df, genome_lengths) * 100, '%')
+    print()
+
     tree_holder = TreeHolder(tree_file, labels_dict=make_labels_dict(labels_file))
+
 
     genomes, blocks, block_genome_count = get_genomes_contain_blocks_grimm(blocks_folder + GRIMM_FILENAME)
 
@@ -88,7 +98,7 @@ def balanced_rearrangements_characters():
 @decorate("Balanced rearrangements stats")
 def balanced_rearrangements_stats():
     global b_characters, b_stats
-    
+
     print('Counting distances between unique one-copy blocks, may take a while')
     distance_between_uniq_blocks = distance_between_blocks_dict(blocks_df, genome_lengths, unique_blocks)
     b_stats = get_characters_stats_balanced(b_characters, tree_holder, distance_between_uniq_blocks)

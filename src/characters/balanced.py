@@ -56,6 +56,8 @@ def get_characters(grimm_file, genomes):
     bg = GRIMMReader.get_breakpoint_graph(open(grimm_file))
     print('Breakpoint graph parsed')
 
+    print('Edges in breakpoint graph:', len(list(bg.edges())))
+
     characters = []
 
     # consistency_checker = TreeConsistencyChecker(tree_file)
