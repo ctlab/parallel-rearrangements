@@ -5,6 +5,14 @@ Bacterial genomes are remarkably plastic on the evolutionary time scale, and gen
 Identification of these events requires laborious manual inspection and verification of the phyletic pattern consistency. 
 Thus, the main goal of this project is identification and description of parallel rearrangements occurring in bacterial genomes.
 
+More strictly, our goal is to find characters which are non-convex on a phylogenetic tree, 
+or in other words characters with homoplasy.
+Homoplasy is when a character state has been gained independently in separate lineages over the course of evolution.
+You can see an example of convex and non-convex below:
+
+Non-convex character <br> (character with homoplasy) |  Convex character <br> (homoplasy-free character)
+:-------------------------:|:-------------------------:
+![](figs/example-non-convex.svg)  |  ![](figs/example-convex.svg)
 
 ## Methods
 This method takes synteny blocks and phylogenetic tree for some stamps as input and 
