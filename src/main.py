@@ -52,13 +52,16 @@ BALANCED_FOLDER = 'balanced_rearrangements_output/'
 UNBALANCED_FOLDER = 'un' + BALANCED_FOLDER
 
 CHARACTERS_FOLDER = 'characters/'
-TREES_FOLDER = 'trees/'
+TREES_FOLDER = 'tree_colorings/'
 
 BALANCED_COLORS = ['White', 'Gainsboro', 'LightGreen', 'LightBlue', 'NavajoWhite', 'LightPink', 'LightCoral', 'Purple',
                    'Navy', 'Olive', 'Teal', 'SaddleBrown', 'SeaGreen', 'DarkCyan', 'DarkOliveGreen', 'DarkSeaGreen']
 
 UNBALANCED_COLORS = ['Gainsboro', 'White'] + BALANCED_COLORS[2:]
 
+# This module converts data from the output data format
+# of Sibelia or Ragout scripts into the infercars format to simplify the subsequent annotation.
+# Also filtering blocks in the grimm format for unique single-copy blocks for the breakpoint graph construction.
 @decorate("Preprocess Data")
 def preprocess_data():
     global unique_blocks
@@ -66,7 +69,11 @@ def preprocess_data():
     print('Converting block coords to infercars format')
     block_coords_to_infercars(blocks_folder + BLOCKS_COORD_FILENAME, preprocessed_data_folder + INFERCARS_FILENAME)
 
-
+# In this module, parsing of input blocks and their coordinates, as well as a phylogenetic, takes place.
+# Next, some statistics are calculated: the total number of blocks,
+# the number of unique single-copy blocks, as well as the percentage of genome coverage with these two types of blocks.
+# After that, the correspondence of strains set on the phylogenetic tree and strains set in the synthenic blocks
+# is checked, if necessary, the missing strains are discarded.
 @decorate("Parsers and check strains")
 def parsers_and_stats():
     global genome_lengths, blocks_df, tree_holder, genomes, blocks, block_genome_count
@@ -89,12 +96,16 @@ def parsers_and_stats():
 
     genomes = check_stats_stains(tree_holder, set(genomes))
 
-
+# In this module, the breakpoint of the graph is built using the bg library,
+# then an algorithm for constructing characters and their states for each edge of the breakpoint graph is implemented.
 @decorate("Balanced rearrangements characters")
 def balanced_rearrangements_characters():
     global b_characters
     b_characters = get_characters(preprocessed_data_folder + UNIQUE_GRIMM_FILENAME, genomes)
 
+# This module implements balanced rearrangements characters statistics calculation
+# (metrics for non-convexity proposed in the paper),
+# as well as an estimate of the average distance of the length of the breakdown in the genome in nucleotides.
 @decorate("Balanced rearrangements stats")
 def balanced_rearrangements_stats():
     global b_characters, b_stats
@@ -117,6 +128,11 @@ def balanced_rearrangements_stats():
 
     print('Left non-convex characters after filtering:', len(b_characters))
 
+# This module generates the output method files: the file stats.csv with the statistics
+# of balanced rearrangements of all non-convex features.
+# The tree_colorings folder contains characters visualized on the phylogenetic tree in .pdf format,
+# different colors correspond to different states of the character, and the characters folder contains the .csv format
+# files for the character states in different strains for each character.
 @decorate("Balanced rearrangements output")
 def balanced_rearrangements_output():
     balanced_folder = output_folder + BALANCED_FOLDER
@@ -131,12 +147,17 @@ def balanced_rearrangements_output():
     trees_folder = balanced_folder + TREES_FOLDER
     write_trees_balanced(b_characters, trees_folder, show_branch_support, tree_holder, BALANCED_COLORS)
 
+# In this module, the mapping of blocks by its number for each strain is performed.
 @decorate("Unbalanced rearrangements characters")
 def unbalanced_rearrangements_characters():
     global ub_characters
     ub_characters = [{genome: block_genome_count[block][genome] for genome in genomes}
                      for block in blocks]
 
+# This module implements balanced rearrangements characters statistics calculation
+# (metrics for non-convexity proposed in the paper),
+# as well as the construction of distance matrices based on a measure of Jacquard similarity and distance in nucleotides
+# and the subsequent clustering for unbalanced characters.
 @decorate("Unbalanced rearrangements stats and clustering")
 def unbalanced_rearrangements_stats_and_clustering():
     global ub_cls, ub_characters, ub_stats
@@ -163,6 +184,12 @@ def unbalanced_rearrangements_stats_and_clustering():
 
     print('Clusters:', np.unique(ub_cls).shape[0])
 
+# In this module, the output of the method files is generated: the file stats.csv with the statistics of unbalanced
+# genomic rearrangements of all non-convex characters.
+# The tree_colorings folder contains characters visualized on the phylogenetic tree in .pdf format,
+# and in the characters folder contain the .csv files for the character states in different strains
+# for all the characters.
+# These .pdf and .csv files are located in subfolders according to their presentation in clustering.
 @decorate('Unbalanced rearrangements output')
 def unbalanced_rearrangements_output():
     unbalanced_folder = output_folder + UNBALANCED_FOLDER
