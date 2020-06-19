@@ -104,7 +104,7 @@ def balanced_rearrangements_characters():
     b_characters = get_characters(preprocessed_data_folder + UNIQUE_GRIMM_FILENAME, genomes)
 
 # This module implements balanced rearrangements characters statistics calculation
-# (metrics for non-convexity proposed in the paper),
+# (measure for non-convexity proposed in the paper),
 # as well as an estimate of the average distance of the length of the breakdown in the genome in nucleotides.
 @decorate("Balanced rearrangements stats")
 def balanced_rearrangements_stats():
@@ -155,7 +155,7 @@ def unbalanced_rearrangements_characters():
                      for block in blocks]
 
 # This module implements balanced rearrangements characters statistics calculation
-# (metrics for non-convexity proposed in the paper),
+# (measure for non-convexity proposed in the paper),
 # as well as the construction of distance matrices based on a measure of Jacquard similarity and distance in nucleotides
 # and the subsequent clustering for unbalanced characters.
 @decorate("Unbalanced rearrangements stats and clustering")

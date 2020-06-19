@@ -17,7 +17,7 @@ Non-convex character <br> (character with homoplasy) |  Convex character <br> (h
 ## Methods
 This method takes synteny blocks and phylogenetic tree for some strains as input and 
 Method consist of two main parts:
-1. Constructing characters and them states (~colors of leaves):
+1. Constructing characters and them states (~colors of leaves) with synteny blocks:
     * Balanced rearrangements (focused in inversions) — search pattern in multiple breakpoint graph;
     * Unbalanced rearrangements — considered as copy number variation.
 2. Checking convexity of constructed characters on a phylogenetic tree. 
