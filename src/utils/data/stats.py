@@ -40,14 +40,14 @@ def distance_between_blocks_dict(df_blocks, genome_length, allowed_blocks=None):
         for b1, st1, end1, b2, st2, end2 in combs:
             if b1 >= b2: continue
             distances[(b1, b2)][strain] = min(distances[(b1, b2)][strain],
+                                              abs(st1 - st2),
+                                              l - abs(st1 - st2),
+                                              abs(st1 - end2),
+                                              l - abs(st1 - end2),
                                               abs(end1 - st2),
                                               l - abs(end1 - st2),
-                                              abs(end2 - st1),
-                                              l - abs(end2 - st1),
-                                              abs(end1 - st1),
-                                              l - abs(end1 - st1),
-                                              abs(end2 - st2),
-                                              l - abs(end2 - st2),
+                                              abs(end1 - end2),
+                                              l - abs(end1 - end2),
                                               )
 
     return distances

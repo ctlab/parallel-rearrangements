@@ -81,7 +81,7 @@ PYTHONPATH=. python3 src/main.py -t example-data/e_coli/input/tree.nwk -b exampl
 -------------------------------------------------------------------------------- 
 Converting block coords to infercars format
 -------------------------------------------------------------------------------- 
-<Module finished: Preprocess Data>, elapsed 7.241912841796875 seconds
+<Module finished: Preprocess Data>, elapsed 6.938694953918457 seconds
 
 
 <Running module: Parsers and check strains>
@@ -95,7 +95,7 @@ Strains in blocks file count: 414
 Strains in tree leafs count: 414
 Intersected strains count: 414
 -------------------------------------------------------------------------------- 
-<Module finished: Parsers and check strains>, elapsed 1.1823408603668213 seconds
+<Module finished: Parsers and check strains>, elapsed 1.1283211708068848 seconds
 
 
 <Running module: Balanced rearrangements characters>
@@ -104,7 +104,7 @@ Breakpoint graph parsed
 Edges in breakpoint graph: 185
 Getting characters from breakpoint graph component, size=66
 -------------------------------------------------------------------------------- 
-<Module finished: Balanced rearrangements characters>, elapsed 11.529837846755981 seconds
+<Module finished: Balanced rearrangements characters>, elapsed 11.117300987243652 seconds
 
 
 <Running module: Balanced rearrangements stats>
@@ -113,19 +113,19 @@ Counting distances between unique one-copy blocks, may take a while
 Got characters after breakpoint graph consideration: 33
 Left non-convex characters after filtering: 26
 -------------------------------------------------------------------------------- 
-<Module finished: Balanced rearrangements stats>, elapsed 7.88664984703064 seconds
+<Module finished: Balanced rearrangements stats>, elapsed 7.587311029434204 seconds
 
 
 <Running module: Balanced rearrangements output>
 -------------------------------------------------------------------------------- 
 -------------------------------------------------------------------------------- 
-<Module finished: Balanced rearrangements output>, elapsed 20.708022832870483 seconds
+<Module finished: Balanced rearrangements output>, elapsed 20.30529260635376 seconds
 
 
 <Running module: Unbalanced rearrangements characters>
 -------------------------------------------------------------------------------- 
 -------------------------------------------------------------------------------- 
-<Module finished: Unbalanced rearrangements characters>, elapsed 0.05321693420410156 seconds
+<Module finished: Unbalanced rearrangements characters>, elapsed 0.05289006233215332 seconds
 
 
 <Running module: Unbalanced rearrangements stats and clustering>
@@ -136,16 +136,16 @@ Counting distances between non-convex character blocks, may take a while
 Jaccard index matrix constructed
 Proximity matrix constructed
 Clustring is done
-Clusters: 70
+Clusters: 86
 -------------------------------------------------------------------------------- 
-<Module finished: Unbalanced rearrangements stats and clustering>, elapsed 13.835783958435059 seconds
+<Module finished: Unbalanced rearrangements stats and clustering>, elapsed 13.429708242416382 seconds
 
 
 <Running module: Unbalanced rearrangements output>
 -------------------------------------------------------------------------------- 
 -------------------------------------------------------------------------------- 
-<Module finished: Unbalanced rearrangements output>, elapsed 182.19800281524658 seconds
+<Module finished: Unbalanced rearrangements output>, elapsed 178.54327082633972 seconds
 
 
-Total elapsed time: 244.6363708972931
+Total elapsed time: 239.10328888893127
 ```
