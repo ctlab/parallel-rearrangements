@@ -43,7 +43,11 @@ def distance_between_blocks_dict(df_blocks, genome_length, allowed_blocks=None):
                                               abs(end1 - st2),
                                               l - abs(end1 - st2),
                                               abs(end2 - st1),
-                                              l - abs(end2 - st1)
+                                              l - abs(end2 - st1),
+                                              abs(end1 - st1),
+                                              l - abs(end1 - st1),
+                                              abs(end2 - st2),
+                                              l - abs(end2 - st2),
                                               )
 
     return distances
