@@ -8,14 +8,14 @@ Thus, the main goal of this project is identification and description of paralle
 More strictly, our goal is to find characters which are non-convex on a phylogenetic tree, 
 or in other words characters with homoplasy.
 Homoplasy is when a character state has been gained independently in separate lineages over the course of evolution.
-You can see an example of convex and non-convex below:
+You can see an example of convex and non-convex characters below:
 
 Non-convex character <br> (character with homoplasy) |  Convex character <br> (homoplasy-free character)
 :-------------------------:|:-------------------------:
 ![](figs/example-non-convex.svg)  |  ![](figs/example-convex.svg)
 
 ## Methods
-This method takes synteny blocks and phylogenetic tree for some stamps as input and 
+This method takes synteny blocks and phylogenetic tree for some strains as input and 
 Method consist of two main parts:
 1. Constructing characters and them states (~colors of leaves):
     * Balanced rearrangements (focused in inversions) — search pattern in multiple breakpoint graph;
@@ -81,7 +81,7 @@ PYTHONPATH=. python3 src/main.py -t example-data/e_coli/input/tree.nwk -b exampl
 -------------------------------------------------------------------------------- 
 Converting block coords to infercars format
 -------------------------------------------------------------------------------- 
-<Module finished: Preprocess Data>, elapsed 7.609349966049194 seconds
+<Module finished: Preprocess Data>, elapsed 7.241912841796875 seconds
 
 
 <Running module: Parsers and check strains>
@@ -90,11 +90,12 @@ Blocks count: 409
 Unique one-copy blocks count: 49
 Mean block coverage: 17.835936180054084 %
 Mean unique one-copy blocks coverage: 7.925360661469914 %
+
 Strains in blocks file count: 414
 Strains in tree leafs count: 414
 Intersected strains count: 414
 -------------------------------------------------------------------------------- 
-<Module finished: Parsers and check strains>, elapsed 1.2990689277648926 seconds
+<Module finished: Parsers and check strains>, elapsed 1.1823408603668213 seconds
 
 
 <Running module: Balanced rearrangements characters>
@@ -103,7 +104,7 @@ Breakpoint graph parsed
 Edges in breakpoint graph: 185
 Getting characters from breakpoint graph component, size=66
 -------------------------------------------------------------------------------- 
-<Module finished: Balanced rearrangements characters>, elapsed 12.504327297210693 seconds
+<Module finished: Balanced rearrangements characters>, elapsed 11.529837846755981 seconds
 
 
 <Running module: Balanced rearrangements stats>
@@ -112,19 +113,19 @@ Counting distances between unique one-copy blocks, may take a while
 Got characters after breakpoint graph consideration: 33
 Left non-convex characters after filtering: 26
 -------------------------------------------------------------------------------- 
-<Module finished: Balanced rearrangements stats>, elapsed 8.442066192626953 seconds
+<Module finished: Balanced rearrangements stats>, elapsed 7.88664984703064 seconds
 
 
 <Running module: Balanced rearrangements output>
 -------------------------------------------------------------------------------- 
 -------------------------------------------------------------------------------- 
-<Module finished: Balanced rearrangements output>, elapsed 31.604016065597534 seconds
+<Module finished: Balanced rearrangements output>, elapsed 20.708022832870483 seconds
 
 
 <Running module: Unbalanced rearrangements characters>
 -------------------------------------------------------------------------------- 
 -------------------------------------------------------------------------------- 
-<Module finished: Unbalanced rearrangements characters>, elapsed 0.05319714546203613 seconds
+<Module finished: Unbalanced rearrangements characters>, elapsed 0.05321693420410156 seconds
 
 
 <Running module: Unbalanced rearrangements stats and clustering>
@@ -135,16 +136,16 @@ Counting distances between non-convex character blocks, may take a while
 Jaccard index matrix constructed
 Proximity matrix constructed
 Clustring is done
-Clusters: 86
+Clusters: 70
 -------------------------------------------------------------------------------- 
-<Module finished: Unbalanced rearrangements stats and clustering>, elapsed 14.41875410079956 seconds
+<Module finished: Unbalanced rearrangements stats and clustering>, elapsed 13.835783958435059 seconds
 
 
 <Running module: Unbalanced rearrangements output>
 -------------------------------------------------------------------------------- 
 -------------------------------------------------------------------------------- 
-<Module finished: Unbalanced rearrangements output>, elapsed 292.3992590904236 seconds
+<Module finished: Unbalanced rearrangements output>, elapsed 182.19800281524658 seconds
 
 
-Total elapsed time: 368.3306360244751
+Total elapsed time: 244.6363708972931
 ```
