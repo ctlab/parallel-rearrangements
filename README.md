@@ -1,5 +1,7 @@
-# Parallel rearrangements
+# PaReBrick 
+## Parallel Rearrangement and Breakpoints
 
+---
 ## Project goals
 Bacterial genomes are remarkably plastic on the evolutionary time scale, and genomic rearrangements such as inversions, deletions, insertions, and duplications independently occur in the genomes of different strains, which may serve a mechanism of the adaptation to changing environmental conditions. 
 Identification of these events requires laborious manual inspection and verification of the phyletic pattern consistency. 

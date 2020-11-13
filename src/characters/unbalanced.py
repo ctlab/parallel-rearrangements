@@ -26,7 +26,8 @@ def write_stats_csv_unbalanced(stats, cls, stats_file):
 
 def call_unique_characters_one_cluster(cur_characters, cur_stats):
     count_blocks = defaultdict(list)
-    for char, (block, _0, _1, _2) in zip(cur_characters, cur_stats):
+    for char, stats in zip(cur_characters, cur_stats):
+        block = stats[0]
         count_blocks[frozenset(char.items())].append(block)
     return count_blocks
 

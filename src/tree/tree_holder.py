@@ -9,6 +9,13 @@ class TreeHolder:
         self.scale = scale
 
         for node in self.tree.traverse():
+            if len(node.children) == 3:
+                print("Trying to root tree by first child of root")
+                print('Children of root:', node.children)
+                self.tree.set_outgroup(node.children[0])
+            break
+
+        for node in self.tree.traverse():
             # Hide node circles
             node.img_style['size'] = 0
 
@@ -48,7 +55,7 @@ class TreeHolder:
         self.tree.render(file, w=1000, tree_style=ts)
 
     def get_all_leafs(self):
-        return {node.name for node in self.tree.traverse() if node.is_leaf()}
+        return {node.name for node in self.tree.get_leaves()}
 
     def count_innovations_fitch(self, leaf_colors):
         def assign_colorset_feature(v):

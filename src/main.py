@@ -7,57 +7,69 @@ from time import time
 from itertools import takewhile
 from operator import itemgetter
 
-from src.characters.balanced import get_characters, write_characters_csv_balanced, get_characters_stats_balanced, \
+from characters.balanced import get_characters, write_characters_csv_balanced, get_characters_stats_balanced, \
     write_trees_balanced, write_stats_csv_balanced
-from src.characters.unbalanced import get_characters_stats_unbalanced, write_stats_csv_unbalanced, \
+from characters.unbalanced import get_characters_stats_unbalanced, write_stats_csv_unbalanced, \
     write_characters_csv_unbalanced, call_unique_characters, write_trees_unbalanced
 
-from src.clustering.clustering import clustering, split_by_cluster
+from clustering.clustering import clustering, split_by_cluster
 
-from src.utils.data.converters import block_coords_to_infercars
-from src.utils.data.parsers import genome_lengths_from_block_coords, parse_infercars_to_df, \
+from utils.data.converters import block_coords_to_infercars
+from utils.data.parsers import genome_lengths_from_block_coords, parse_infercars_to_df, \
     get_genomes_contain_blocks_grimm, make_labels_dict
-from src.utils.data.unique_gene_filters import grimm_filter_unique_gene, filter_dataframe_unique
-from src.utils.data.stats import distance_between_blocks_dict, check_stats_stains, get_mean_coverage
+from utils.data.unique_gene_filters import grimm_filter_unique_gene, filter_dataframe_unique
+from utils.data.stats import distance_between_blocks_dict, check_stats_stains, get_mean_coverage
 
-from src.utils.decorators import decorate
+from utils.decorators import decorate
 
-from src.tree.tree_holder import TreeHolder
+from tree.tree_holder import TreeHolder
 
 # argument parsing
-parser = argparse.ArgumentParser(
-    description='Based on synteny blocks and phylogenetic tree this tool calls parallel rearrangements.')
+def initialize():
+    global parser, GRIMM_FILENAME, UNIQUE_GRIMM_FILENAME, BLOCKS_COORD_FILENAME, INFERCARS_FILENAME, STATS_FILE, \
+        BALANCED_FOLDER, UNBALANCED_FOLDER, CHARACTERS_FOLDER, TREES_FOLDER, BALANCED_COLORS, UNBALANCED_COLORS, \
+        clustering_proximity_percentile, clustering_threshold, clustering_j, clustering_j, clustering_b
 
-parser.add_argument('--tree', '-t', required=True, help='Tree in newick format, must be parsable by ete3 library.'
-                                                        'You can read more about formats supported by ete3 at http://etetoolkit.org/docs/latest/tutorial/tutorial_trees.html#reading-and-writing-newick-trees')
-parser.add_argument('--blocks_folder', '-b', required=True,
-                    help='Path to folder with blocks resulted as output of original Sibelia or maf2synteny tool.')
-parser.add_argument('--labels', '-l', default='', help='Path to csv file with tree labels, must contain two columns: `strain` and `label`.')
-parser.add_argument('--output', '-o', required=True, help='Path to output folder.')
+    parser = argparse.ArgumentParser(
+        description='Based on synteny blocks and phylogenetic tree this tool calls parallel rearrangements.')
 
-show_branch_support = True
-clustering_proximity_percentile = 25
-clustering_threshold = 0.125
-clustering_j = 0.75
-clustering_b = 0.25
+    required = parser.add_argument_group('Required arguments')
+    optional = parser.add_argument_group('Optional arguments')
 
-GRIMM_FILENAME = 'genomes_permutations.txt'
-UNIQUE_GRIMM_FILENAME = 'genomes_permutations_unique.txt'
+    required.add_argument('--tree', '-t', required=True, help='Tree in newick format, must be parsable by ete3 library.'
+                                                            'You can read more about formats supported by ete3 at http://etetoolkit.org/docs/latest/tutorial/tutorial_trees.html#reading-and-writing-newick-trees')
+    required.add_argument('--blocks_folder', '-b', required=True,
+                        help='Path to folder with blocks resulted as output of original Sibelia or maf2synteny tool.')
 
-BLOCKS_COORD_FILENAME = 'blocks_coords.txt'
-INFERCARS_FILENAME = 'blocks_coords.infercars'
+    optional.add_argument('--output', '-o', default='parebrick_output', help='Path to output folder.')
+    optional.add_argument('--labels', '-l', default='',
+                          help='Path to csv file with tree labels, must contain two columns: `strain` and `label`.')
 
-STATS_FILE = 'stats.csv'
-BALANCED_FOLDER = 'balanced_rearrangements_output/'
-UNBALANCED_FOLDER = 'un' + BALANCED_FOLDER
+    optional.add_argument('--show_branch_support', '-sbs', type=bool, default=True,
+                          help='Show branch support while tree rendering (ete3 parameter)')
 
-CHARACTERS_FOLDER = 'characters/'
-TREES_FOLDER = 'tree_colorings/'
+    clustering_proximity_percentile = 25
+    clustering_threshold = 0.125
+    clustering_j = 0.75
+    clustering_b = 0.25
 
-BALANCED_COLORS = ['White', 'Gainsboro', 'LightGreen', 'LightBlue', 'NavajoWhite', 'LightPink', 'LightCoral', 'Purple',
-                   'Navy', 'Olive', 'Teal', 'SaddleBrown', 'SeaGreen', 'DarkCyan', 'DarkOliveGreen', 'DarkSeaGreen']
+    GRIMM_FILENAME = 'genomes_permutations.txt'
+    UNIQUE_GRIMM_FILENAME = 'genomes_permutations_unique.txt'
 
-UNBALANCED_COLORS = ['Gainsboro', 'White'] + BALANCED_COLORS[2:]
+    BLOCKS_COORD_FILENAME = 'blocks_coords.txt'
+    INFERCARS_FILENAME = 'blocks_coords.infercars'
+
+    STATS_FILE = 'stats.csv'
+    BALANCED_FOLDER = 'balanced_rearrangements_output/'
+    UNBALANCED_FOLDER = 'un' + BALANCED_FOLDER
+
+    CHARACTERS_FOLDER = 'characters/'
+    TREES_FOLDER = 'tree_colorings/'
+
+    BALANCED_COLORS = ['White', 'Gainsboro', 'LightGreen', 'LightBlue', 'NavajoWhite', 'LightPink', 'LightCoral', 'Purple',
+                       'Navy', 'Olive', 'Teal', 'SaddleBrown', 'SeaGreen', 'DarkCyan', 'DarkOliveGreen', 'DarkSeaGreen']
+
+    UNBALANCED_COLORS = ['Gainsboro', 'White'] + BALANCED_COLORS[2:]
 
 # This module converts data from the output data format
 # of Sibelia or Ragout scripts into the infercars format to simplify the subsequent annotation.
@@ -209,10 +221,14 @@ def unbalanced_rearrangements_output():
     write_trees_unbalanced(unique_chars_list, trees_folder, show_branch_support, tree_holder, UNBALANCED_COLORS)
 
 
-if __name__ == "__main__":
+def main():
+    global blocks_folder, output_folder, tree_file, labels_file, preprocessed_data_folder, show_branch_support
+    initialize()
+
     start_time = time()
     d = vars(parser.parse_args())
-    blocks_folder, output_folder, tree_file, labels_file = d['blocks_folder'], d['output'], d['tree'], d['labels']
+    blocks_folder, output_folder, tree_file, labels_file, show_branch_support = \
+        d['blocks_folder'], d['output'], d['tree'], d['labels'], d['sbs']
 
     # folders
     if blocks_folder[:-1] != '/': blocks_folder += '/'
@@ -232,4 +248,8 @@ if __name__ == "__main__":
     unbalanced_rearrangements_stats_and_clustering()
     unbalanced_rearrangements_output()
 
-    print('Total elapsed time:', time() - start_time)
+    print('Total elapsed time:', time() - start_time, 'seconds')
+
+
+if __name__ == "__main__":
+    main()

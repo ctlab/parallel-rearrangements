@@ -62,6 +62,8 @@ def check_stats_stains(tree, block_genomes):
 
     if not len(block_genomes & tree_genomes) == len(tree_genomes) == len(block_genomes):
         if len(block_genomes & tree_genomes) == 0:
+            print('Tree genomes:', tree_genomes)
+            print('Blocks genomes:', block_genomes)
             raise ValueError(
                 'Seems like strains in block files and in tree leafs have different ids, intersection is empty.')
         left_tree = tree_genomes - (block_genomes & tree_genomes)
