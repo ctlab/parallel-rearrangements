@@ -8,7 +8,7 @@ long_description = (here / 'README.md').read_text(encoding='utf-8')
 
 setup(
     name='PaReBrick',
-    version='0.1.9',
+    version='0.1.10',
     description='A bioinf tool for finding genome rearrangements in bacterial genomes',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -28,7 +28,8 @@ setup(
     keywords='genome rearrangements, phylogenetic trees, non-convex characters, synteny blocks, phylogenetic tree, '
              'pattern consistency',
     package_dir={'parebrick': 'parebrick'},
-    packages=find_packages(where='parebrick'),
+    packages=['parebrick', 'parebrick.characters', 'parebrick.clustering', 'parebrick.tree', 'parebrick.utils',
+              'parebrick.utils.data'],
     python_requires='>=3.6, <4',
     install_requires=
         ['PyQt5', # for ete3 working properly
