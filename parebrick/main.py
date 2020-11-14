@@ -7,22 +7,22 @@ from time import time
 from itertools import takewhile
 from operator import itemgetter
 
-from characters.balanced import get_characters, write_characters_csv_balanced, get_characters_stats_balanced, \
+from parebrick.characters.balanced import get_characters, write_characters_csv_balanced, get_characters_stats_balanced, \
     write_trees_balanced, write_stats_csv_balanced
-from characters.unbalanced import get_characters_stats_unbalanced, write_stats_csv_unbalanced, \
+from parebrick.characters.unbalanced import get_characters_stats_unbalanced, write_stats_csv_unbalanced, \
     write_characters_csv_unbalanced, call_unique_characters, write_trees_unbalanced
 
-from clustering.clustering import clustering, split_by_cluster
+from parebrick.clustering.clustering import clustering, split_by_cluster
 
-from utils.data.converters import block_coords_to_infercars
-from utils.data.parsers import genome_lengths_from_block_coords, parse_infercars_to_df, \
+from parebrick.utils.data.converters import block_coords_to_infercars
+from parebrick.utils.data.parsers import genome_lengths_from_block_coords, parse_infercars_to_df, \
     get_genomes_contain_blocks_grimm, make_labels_dict
-from utils.data.unique_gene_filters import grimm_filter_unique_gene, filter_dataframe_unique
-from utils.data.stats import distance_between_blocks_dict, check_stats_stains, get_mean_coverage
+from parebrick.utils.data.unique_gene_filters import grimm_filter_unique_gene, filter_dataframe_unique
+from parebrick.utils.data.stats import distance_between_blocks_dict, check_stats_stains, get_mean_coverage
 
-from utils.decorators import decorate
+from parebrick.utils.decorators import decorate
 
-from tree.tree_holder import TreeHolder
+from parebrick.tree.tree_holder import TreeHolder
 
 # argument parsing
 def initialize():
@@ -228,7 +228,7 @@ def main():
     start_time = time()
     d = vars(parser.parse_args())
     blocks_folder, output_folder, tree_file, labels_file, show_branch_support = \
-        d['blocks_folder'], d['output'], d['tree'], d['labels'], d['sbs']
+        d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support']
 
     # folders
     if blocks_folder[:-1] != '/': blocks_folder += '/'

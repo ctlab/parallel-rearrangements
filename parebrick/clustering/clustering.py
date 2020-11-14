@@ -1,6 +1,6 @@
 import numpy as np
 
-from clustering.distance_matrices import dist_matrix_similarity, dist_matrix_proximity
+from parebrick.clustering.distance_matrices import dist_matrix_similarity, dist_matrix_proximity
 
 from sklearn.cluster import AgglomerativeClustering
 

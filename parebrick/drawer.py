@@ -1,14 +1,13 @@
-from utils.data.parsers import parse_infercars_to_df
-from utils.data.stats import distance_between_blocks_distribution
-from utils.data.unique_gene_filters import filter_dataframe_unique
+from parebrick.utils.data.parsers import parse_infercars_to_df
+from parebrick.utils.data.stats import distance_between_blocks_distribution
+from parebrick.utils.data.unique_gene_filters import filter_dataframe_unique
 
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-sns.set(style="whitegrid", font="serif")
-df = parse_infercars_to_df('data/xanthomonas_citri/output/1000/preprocessed_data/blocks_coords.infercars')
-out_folder = 'data/xanthomonas_citri/output/1000/charts/'
+import argparse
+import os
 
 
 def blocks_length_dist(df):
@@ -23,7 +22,7 @@ def lengths_between(state, log):
     else:
         ds = distance_between_blocks_distribution(df)
 
-    sns.distplot(ds, kde=False, bins=100, hist_kws={'log': log, 'alpha': 0.7})
+    sns.histplot(ds, bins=100, kde_kws={'log': log, 'alpha': 0.7})
 
     plt.ylabel('Number of blocks')
     plt.xlabel('Length in nucleotides')
@@ -33,7 +32,7 @@ def lengths_between(state, log):
     plt.xlim(xmin=0)
 
     plt.savefig(out_folder + f'lengths_between_{state}_filtering{"_log" if log else ""}.pdf')
-    plt.show()
+    # plt.show()
 
 
 def number_of_genomes_weighted(weighted, log):
@@ -47,9 +46,9 @@ def number_of_genomes_weighted(weighted, log):
 
     bins = 100 if max(vs) > 100 else max(vs)
     if weighted:
-        sns.distplot(vs, kde=False, bins=bins, hist_kws={'log': log, 'alpha': 0.7, 'weights': ws})
+        sns.histplot(vs, bins=bins, kde_kws={'log': log, 'alpha': 0.7, 'weights': ws})
     else:
-        sns.distplot(vs, kde=False, bins=bins, hist_kws={'log': log, 'alpha': 0.7})
+        sns.histplot(vs, bins=bins, kde_kws={'log': log, 'alpha': 0.7})
 
     plt.ylabel('Length of fragments that are present\n in n genomes, nucleotides'
                if weighted else 'Number of blocks')
@@ -59,7 +58,7 @@ def number_of_genomes_weighted(weighted, log):
     plt.xlim(xmin=0, xmax=max(vs))
     plt.tight_layout()
     plt.savefig(out_folder + f'blocks_frequency{"_weighted" if weighted else ""}{"_log" if log else ""}.pdf')
-    plt.show()
+    # plt.show()
 
 
 def block_length(log):
@@ -69,8 +68,8 @@ def block_length(log):
     ds_after = blocks_length_dist(df_filtered)
 
     bins = np.linspace(min(ds_before), max(ds_before), 100)
-    sns.distplot(ds_before, kde=False, bins=bins, hist_kws={'log': log, 'alpha': 0.7}, label='not-common')
-    sns.distplot(ds_after, kde=False, bins=bins, hist_kws={'log': log, 'alpha': 0.7}, label='common')
+    sns.histplot(ds_before, bins=bins, kde_kws={'log': log, 'alpha': 0.7}, label='not-common')
+    sns.histplot(ds_after, bins=bins, kde_kws={'log': log, 'alpha': 0.7}, label='common', color='red')
 
     plt.ylabel('Number of blocks')
     plt.xlabel('Length in nucleotides')
@@ -81,7 +80,7 @@ def block_length(log):
 
     plt.tight_layout()
     plt.savefig(out_folder + f'block_lengths_distribution{"_log" if log else ""}.pdf')
-    plt.show()
+    # plt.show()
 
 
 def scatter_len_genomes_count(log):
@@ -108,7 +107,7 @@ def scatter_len_genomes_count(log):
     plt.subplots_adjust(left=0.14, right=0.99)
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
 
 
 def pan_blocks(permutations=10000):
@@ -147,7 +146,7 @@ def pan_blocks(permutations=10000):
         # plt.subplots_adjust(top=0.99, right=0.99)
         plt.tight_layout()
         plt.savefig(out_folder + 'new_blocks.pdf')
-        plt.show()
+        # plt.show()
 
     def pan():
         plt.figure()
@@ -165,27 +164,55 @@ def pan_blocks(permutations=10000):
         # plt.subplots_adjust(top=0.99, right=0.99)
         plt.tight_layout()
         plt.savefig(out_folder + 'pan_blocks.pdf')
-        plt.show()
+        # plt.show()
 
     new_blocks()
     pan()
 
+def main():
+    global out_folder, df
 
+    parser = argparse.ArgumentParser(
+        description='Building charts for pan-genome analysis based on synteny blocks.')
 
-lengths_between('before', log=False)
-lengths_between('after', log=False)
-lengths_between('before', log=True)
-lengths_between('after', log=True)
+    parser.add_argument('--infercars_file', '-f', required=True,
+                      help='Path to file in infercars format, can be found in main script output')
 
-number_of_genomes_weighted(weighted=False, log=False)
-number_of_genomes_weighted(weighted=True, log=False)
-number_of_genomes_weighted(weighted=False, log=True)
-number_of_genomes_weighted(weighted=True, log=True)
+    parser.add_argument('--output', '-o', default='parebrick_charts', help='Path to output folder.')
 
-block_length(log=True)
-block_length(log=False)
+    args = parser.parse_args()
+    d = vars(args)
 
-scatter_len_genomes_count(False)
-scatter_len_genomes_count(True)
+    file, out_folder = d['infercars_file'], d['output']
 
-pan_blocks()
+    if out_folder[-1] != '/': out_folder += '/'
+    os.makedirs(out_folder, exist_ok=True)
+
+    df = parse_infercars_to_df(file)
+    sns.set(style="whitegrid", font="serif")
+
+    print('Plotting lengths between blocks')
+    lengths_between('before', log=False)
+    lengths_between('after', log=False)
+    lengths_between('before', log=True)
+    lengths_between('after', log=True)
+
+    print('Plotting number of genomes in blocks')
+    number_of_genomes_weighted(weighted=False, log=False)
+    number_of_genomes_weighted(weighted=True, log=False)
+    number_of_genomes_weighted(weighted=False, log=True)
+    number_of_genomes_weighted(weighted=True, log=True)
+
+    print('Plotting blocks length distribution')
+    block_length(log=True)
+    block_length(log=False)
+
+    print('Plotting scatter for occurrence of synteny blocks vs its length')
+    scatter_len_genomes_count(False)
+    scatter_len_genomes_count(True)
+
+    print('Plotting pan-genome plots')
+    pan_blocks()
+
+if __name__ == "__main__":
+    main()
