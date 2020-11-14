@@ -41,6 +41,9 @@ Now you can run tool from any directory as `PaReBrick` (or `parebrick`).
 Main script of project including all modules together can be run from anywhere as console tool.
 
 ### Required input
+
+**Important for input:** Identifiers in tree and on in blocks must be equal;
+
 #### `--tree/t`
 Tree in newick format, must be parsable by ete3 library.
 You can read more about [formats supported by ete3](http://etetoolkit.org/docs/latest/tutorial/tutorial_trees.html#reading-and-writing-newick-trees)
@@ -48,7 +51,7 @@ You can read more about [formats supported by ete3](http://etetoolkit.org/docs/l
 #### `--blocks_folder/-b`
 Path to folder with blocks resulted as output of original Sibelia or maf2synteny tool.
 
-[Instruction about how to obtain synteny blocks using SibeliaZ.](Blocks-obtain.md)
+[BLOCKS-OBTAIN.md](Blocks-obtain.md) — instruction about how to obtain synteny blocks using SibeliaZ.
 
 ### Optional input
 

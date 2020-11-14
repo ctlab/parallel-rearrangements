@@ -1,1 +1,0 @@
-## How to obtain synteny blocks using SibeliaZ?
