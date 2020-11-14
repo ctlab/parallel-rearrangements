@@ -51,7 +51,7 @@ You can read more about [formats supported by ete3](http://etetoolkit.org/docs/l
 #### `--blocks_folder/-b`
 Path to folder with blocks resulted as output of original Sibelia or maf2synteny tool.
 
-[BLOCKS-OBTAIN.md](Blocks-obtain.md) — instruction about how to obtain synteny blocks using SibeliaZ.
+[BLOCKS-OBTAIN.md](BLOCKS-OBTAIN.md) — instruction about how to obtain synteny blocks using SibeliaZ.
 
 ### Optional input
 
