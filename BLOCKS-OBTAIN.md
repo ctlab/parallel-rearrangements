@@ -14,9 +14,12 @@ conda install sibeliaz
 
 ## 2) Running SibeliaZ Alignment
 We recommend to use some parameters: 
-* `-k 15` k-mer size for bacterial size genomes (recommended in SibeliaZ documentation);
-* `-n` to skip the alignment and only output coordinates of the blocks saving time and memory ;
+* `-k 15` k-mer size for bacterial size genomes (recommended in SibeliaZ documentation for bacterial genomes);
+* `-n` to skip the alignment with nucleotides and only output coordinates of the alignment saving time and memory;
 * `-t 4` optional, for desired threads number;
+* **Do not change `-m` parameter**. 
+It will slow down the computation significantly and will not give you blocks. 
+Blocks need to be obtained with `maf2synteny` tool.
 
 Final command:
 ```bash
