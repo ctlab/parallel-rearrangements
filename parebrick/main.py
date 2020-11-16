@@ -1,5 +1,7 @@
 import argparse
 import os
+import logging
+import sys
 
 import numpy as np
 
@@ -23,6 +25,8 @@ from parebrick.utils.data.stats import distance_between_blocks_dict, check_stats
 from parebrick.utils.decorators import decorate
 
 from parebrick.tree.tree_holder import TreeHolder
+
+logger = logging.getLogger()
 
 # argument parsing
 def initialize():
@@ -74,11 +78,11 @@ def initialize():
 # This module converts data from the output data format
 # of Sibelia or Ragout scripts into the infercars format to simplify the subsequent annotation.
 # Also filtering blocks in the grimm format for unique single-copy blocks for the breakpoint graph construction.
-@decorate("Preprocess Data")
+@decorate("Preprocess Data", logger)
 def preprocess_data():
     global unique_blocks
     unique_blocks = grimm_filter_unique_gene(blocks_folder + GRIMM_FILENAME, preprocessed_data_folder + UNIQUE_GRIMM_FILENAME)
-    print('Converting block coords to infercars format')
+    logger.info('Converting block coords to infercars format')
     block_coords_to_infercars(blocks_folder + BLOCKS_COORD_FILENAME, preprocessed_data_folder + INFERCARS_FILENAME)
 
 # In this module, parsing of input blocks and their coordinates, as well as a phylogenetic, takes place.
@@ -86,7 +90,7 @@ def preprocess_data():
 # the number of unique single-copy blocks, as well as the percentage of genome coverage with these two types of blocks.
 # After that, the correspondence of strains set on the phylogenetic tree and strains set in the synthenic blocks
 # is checked, if necessary, the missing strains are discarded.
-@decorate("Parsers and check strains")
+@decorate("Parsers and check strains", logger)
 def parsers_and_stats():
     global genome_lengths, blocks_df, tree_holder, genomes, blocks, block_genome_count
 
@@ -94,40 +98,39 @@ def parsers_and_stats():
     blocks_df = parse_infercars_to_df(preprocessed_data_folder + INFERCARS_FILENAME)
     unique_blocks_df = filter_dataframe_unique(blocks_df)
 
-    print('Blocks count:', len(blocks_df['block'].unique()))
-    print('Unique one-copy blocks count:', len(unique_blocks_df['block'].unique()))
+    logger.info(f'Blocks count: {len(blocks_df["block"].unique())}')
+    logger.info(f'Unique one-copy blocks count: {len(unique_blocks_df["block"].unique())}')
 
-    print('Mean block coverage:', get_mean_coverage(blocks_df, genome_lengths) * 100, '%')
-    print('Mean unique one-copy blocks coverage:', get_mean_coverage(unique_blocks_df, genome_lengths) * 100, '%')
-    print()
+    logger.info(f'Mean block coverage: {get_mean_coverage(blocks_df, genome_lengths) * 100} %')
+    logger.info(f'Mean unique one-copy blocks coverage: {get_mean_coverage(unique_blocks_df, genome_lengths) * 100} %')
 
-    tree_holder = TreeHolder(tree_file, labels_dict=make_labels_dict(labels_file))
+    tree_holder = TreeHolder(tree_file, logger, labels_dict=make_labels_dict(labels_file))
 
 
     genomes, blocks, block_genome_count = get_genomes_contain_blocks_grimm(blocks_folder + GRIMM_FILENAME)
 
-    genomes = check_stats_stains(tree_holder, set(genomes))
+    genomes = check_stats_stains(tree_holder, set(genomes), logger)
 
 # In this module, the breakpoint of the graph is built using the bg library,
 # then an algorithm for constructing characters and their states for each edge of the breakpoint graph is implemented.
-@decorate("Balanced rearrangements characters")
+@decorate("Balanced rearrangements characters", logger)
 def balanced_rearrangements_characters():
     global b_characters
-    b_characters = get_characters(preprocessed_data_folder + UNIQUE_GRIMM_FILENAME, genomes)
+    b_characters = get_characters(preprocessed_data_folder + UNIQUE_GRIMM_FILENAME, genomes, logger)
 
 # This module implements balanced rearrangements characters statistics calculation
 # (measure for non-convexity proposed in the paper),
 # as well as an estimate of the average distance of the length of the breakdown in the genome in nucleotides.
-@decorate("Balanced rearrangements stats")
+@decorate("Balanced rearrangements stats", logger)
 def balanced_rearrangements_stats():
     global b_characters, b_stats
 
-    print('Counting distances between unique one-copy blocks, may take a while')
+    logger.info('Counting distances between unique one-copy blocks, may take a while')
     distance_between_uniq_blocks = distance_between_blocks_dict(blocks_df, genome_lengths, unique_blocks)
     b_stats = get_characters_stats_balanced(b_characters, tree_holder, distance_between_uniq_blocks)
     char_stats = zip(b_characters, b_stats)
 
-    print('Got characters after breakpoint graph consideration:', len(b_characters))
+    logger.info(f'Got characters after breakpoint graph consideration: {len(b_characters)}')
     # sorting for get most interesting characters in the beginning
     # [1][3] for vertex1,vertex2,parallel_rear_score, [1][6] for parallel_breakpoint_score, r[0][0] for vertex1
     char_stats = sorted(char_stats, key=lambda r: (r[1][3], r[1][6], r[0][0]), reverse=True)
@@ -138,14 +141,14 @@ def balanced_rearrangements_stats():
     b_characters = [char for char, stat in char_stats]
     b_stats = [stat for char, stat in char_stats]
 
-    print('Left non-convex characters after filtering:', len(b_characters))
+    logger.info(f'Left non-convex characters after filtering: {len(b_characters)}')
 
 # This module generates the output method files: the file stats.csv with the statistics
 # of balanced rearrangements of all non-convex features.
 # The tree_colorings folder contains characters visualized on the phylogenetic tree in .pdf format,
 # different colors correspond to different states of the character, and the characters folder contains the .csv format
 # files for the character states in different strains for each character.
-@decorate("Balanced rearrangements output")
+@decorate("Balanced rearrangements output", logger)
 def balanced_rearrangements_output():
     balanced_folder = output_folder + BALANCED_FOLDER
     os.makedirs(balanced_folder, exist_ok=True)
@@ -160,7 +163,7 @@ def balanced_rearrangements_output():
     write_trees_balanced(b_characters, trees_folder, show_branch_support, tree_holder, BALANCED_COLORS)
 
 # In this module, the mapping of blocks by its number for each strain is performed.
-@decorate("Unbalanced rearrangements characters")
+@decorate("Unbalanced rearrangements characters", logger)
 def unbalanced_rearrangements_characters():
     global ub_characters
     ub_characters = [{genome: block_genome_count[block][genome] for genome in genomes}
@@ -170,31 +173,31 @@ def unbalanced_rearrangements_characters():
 # (measure for non-convexity proposed in the paper),
 # as well as the construction of distance matrices based on a measure of Jacquard similarity and distance in nucleotides
 # and the subsequent clustering for unbalanced characters.
-@decorate("Unbalanced rearrangements stats and clustering")
+@decorate("Unbalanced rearrangements stats and clustering", logger)
 def unbalanced_rearrangements_stats_and_clustering():
     global ub_cls, ub_characters, ub_stats
     ub_stats = get_characters_stats_unbalanced(blocks, ub_characters, tree_holder)
 
     char_stats = zip(ub_characters, ub_stats)
-    print('Got characters after copy number variation consideration:', len(blocks))
+    logger.info(f'Got characters after copy number variation consideration: {len(blocks)}')
     # sorting for get most interesting characters in the beginning
     # [1][3] for vertex1,vertex2,parallel_rear_score, [1][6] for parallel_breakpoint_score, r[0][0] for vertex1
     char_stats = sorted(char_stats, key=lambda r: (r[1][1], r[1][0]), reverse=True)
     # remove convex characters
     char_stats = list(takewhile(lambda r: r[1][3] > 1, char_stats))
 
-    print('Left non-convex characters after filtering:', len(char_stats))
+    logger.info(f'Left non-convex characters after filtering: {len(char_stats)}')
 
     # unzip
     ub_characters = [char for char, stat in char_stats]
     ub_stats = [stat for char, stat in char_stats]
 
-    print('Counting distances between non-convex character blocks, may take a while')
+    logger.info('Counting distances between non-convex character blocks, may take a while')
     distance_between_blocks = distance_between_blocks_dict(blocks_df, genome_lengths, set(map(itemgetter(0), ub_stats)))
     ub_cls = clustering(ub_characters, ub_stats, distance_between_blocks, max(genome_lengths.values()),
-                        clustering_threshold, clustering_j, clustering_b, clustering_proximity_percentile)
+                        clustering_threshold, clustering_j, clustering_b, clustering_proximity_percentile, logger)
 
-    print('Clusters:', np.unique(ub_cls).shape[0])
+    logger.info(f'Clusters: {np.unique(ub_cls).shape[0]}')
 
 # In this module, the output of the method files is generated: the file stats.csv with the statistics of unbalanced
 # genomic rearrangements of all non-convex characters.
@@ -202,7 +205,7 @@ def unbalanced_rearrangements_stats_and_clustering():
 # and in the characters folder contain the .csv files for the character states in different strains
 # for all the characters.
 # These .pdf and .csv files are located in subfolders according to their presentation in clustering.
-@decorate('Unbalanced rearrangements output')
+@decorate('Unbalanced rearrangements output', logger)
 def unbalanced_rearrangements_output():
     unbalanced_folder = output_folder + UNBALANCED_FOLDER
     os.makedirs(unbalanced_folder, exist_ok=True)
@@ -222,6 +225,17 @@ def unbalanced_rearrangements_output():
 
 
 def main():
+    def logger_initialize():
+        file_handler = logging.FileHandler(filename=output_folder + 'run.log')
+        stdout_handler = logging.StreamHandler(sys.stdout)
+        handlers = [file_handler, stdout_handler]
+
+        logging.basicConfig(
+            level=logging.DEBUG,
+            format='[%(asctime)s] %(levelname)s - %(message)s',
+            handlers=handlers
+        )
+
     global blocks_folder, output_folder, tree_file, labels_file, preprocessed_data_folder, show_branch_support
     initialize()
 
@@ -237,6 +251,8 @@ def main():
     preprocessed_data_folder = output_folder + 'preprocessed_data/'
     os.makedirs(preprocessed_data_folder, exist_ok=True)
 
+    logger_initialize()
+
     preprocess_data()
     parsers_and_stats()
 
@@ -248,7 +264,7 @@ def main():
     unbalanced_rearrangements_stats_and_clustering()
     unbalanced_rearrangements_output()
 
-    print('Total elapsed time:', time() - start_time, 'seconds')
+    logger.info(f'Total elapsed time: {time() - start_time} seconds')
 
 
 if __name__ == "__main__":

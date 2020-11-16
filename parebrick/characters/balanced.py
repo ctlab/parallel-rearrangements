@@ -25,12 +25,9 @@ def get_character_by_edge(bg, edge, genomes, neighbour_index):
             v1, v2 = edge.vertex1.name, edge.vertex2.name
             if v1 > v2: v1, v2 = v2, v1
 
-            # print(v1, v2)
             v1_neighbour = get_neighbour_with_genome(v1, genome)
             v2_neighbour = get_neighbour_with_genome(v2, genome)
-            # print(v1_neighbour, v2_neighbour)
             if bg.get_edge_by_two_vertices(v1_neighbour, v2_neighbour):
-                # print("hey!")
                 pair = (v1_neighbour, v2_neighbour)
                 if pair not in possible_edges:
                     possible_edges.append(pair)
@@ -52,11 +49,11 @@ def construct_vertex_genome_index(bg):
 
     return neighbour_index
 
-def get_characters(grimm_file, genomes):
+def get_characters(grimm_file, genomes, logger):
     bg = GRIMMReader.get_breakpoint_graph(open(grimm_file))
-    print('Breakpoint graph parsed')
+    logger.info('Breakpoint graph parsed')
 
-    print('Edges in breakpoint graph:', len(list(bg.edges())))
+    logger.info(f'Edges in breakpoint graph: {len(list(bg.edges()))}')
 
     characters = []
 
@@ -65,7 +62,7 @@ def get_characters(grimm_file, genomes):
         nodes_len = len(list(component_bg.nodes()))
         if nodes_len == 2: continue
 
-        print(f'Getting characters from breakpoint graph component, size={len(component_bg.bg)}')
+        logger.info(f'Getting characters from breakpoint graph component, size={len(component_bg.bg)}')
 
         neighbour_index = construct_vertex_genome_index(component_bg)
 

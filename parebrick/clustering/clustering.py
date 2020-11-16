@@ -15,20 +15,20 @@ def renew_index(cls):
     new_index_dict = {cl: i for i, cl in enumerate(new_cls_indexes)}
     return np.array([new_index_dict[cl] for cl in cls])
 
-def clustering(characters, stats, distance_between_blocks, max_length, threshold, j, b, proximity_percentile):
+def clustering(characters, stats, distance_between_blocks, max_length, threshold, j, b, proximity_percentile, logger):
     J = dist_matrix_similarity(characters)
     J /= J.max()
-    print('Jaccard index matrix constructed')
+    logger.info('Jaccard index matrix constructed')
 
     B = dist_matrix_proximity(stats, distance_between_blocks, max_length, proximity_percentile)
     B /= B.max()
-    print('Proximity matrix constructed')
+    logger.info('Proximity matrix constructed')
 
     D = J * j + B * b
     cls = AgglomerativeClustering(n_clusters=None, affinity='precomputed', linkage='average',
                                   distance_threshold=threshold).fit_predict(D)
 
-    print('Clustring is done')
+    logger.info('Clustring is done')
 
     return renew_index(cls)
 
