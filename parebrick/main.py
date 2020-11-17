@@ -34,6 +34,8 @@ def initialize():
         BALANCED_FOLDER, UNBALANCED_FOLDER, CHARACTERS_FOLDER, TREES_FOLDER, BALANCED_COLORS, UNBALANCED_COLORS, \
         clustering_proximity_percentile, clustering_threshold, clustering_j, clustering_j, clustering_b
 
+    os.environ['QT_QPA_PLATFORM'] = 'offscreen'
+
     parser = argparse.ArgumentParser(
         description='Based on synteny blocks and phylogenetic tree this tool calls parallel rearrangements.')
 
