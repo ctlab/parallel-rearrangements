@@ -9,7 +9,7 @@ Let's suggest you already have your genomes in `fasta` format in `merged.fna` fi
 
 We recommend installing [SibeliaZ](https://github.com/medvedevgroup/SibeliaZ) with a conda:
 ```bash
-conda install sibeliaz
+conda install sibeliaz -c bionconda
 ```
 
 ## 2) Running SibeliaZ Alignment
