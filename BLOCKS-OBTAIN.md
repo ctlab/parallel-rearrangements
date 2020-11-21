@@ -46,7 +46,7 @@ Also, create file `fine_500.txt` if you want to get shorter blocks (shorter then
 100 500
 ````
 
-More about these parameters and what they mean [here](https://github.com/bioinf/Sibelia/blob/master/SIBELIA.md#custom-parameters-set.
+More about these parameters and what they mean [here](https://github.com/bioinf/Sibelia/blob/master/SIBELIA.md#custom-parameters-set).
 
 ### 3.2) Running
 Then, you can run `maf2syneny` SibeliaZ module with desired minimal block size `-b`. 
