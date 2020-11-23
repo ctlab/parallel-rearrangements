@@ -68,6 +68,7 @@ Output consist of tree folders.
 1. `preprocessed_data` — 
 here you can find `blocks_coords.infercars` for better blocks representation and region annotation.
 And `genomes_permutations_unique.txt` file used for calling balanced characters.
+As well as same data but in `.csv` format for more convenient use.
 2. `balanced_rearrangements_output` — this folder contains `stats.csv` file with all non-convex characters statistics of balanced rearrangements. 
 And folders `characters`, `trees` with character representation in rendered `.pdf` tree and `.csv` formats.
 3. `unbalanced_rearrangements_output` — this folder contains `stats.csv` file with all non-convex characters statistics of unbalanced rearrangements. 
