@@ -2,6 +2,7 @@ import argparse
 import os
 import logging
 import sys
+import csv
 
 import numpy as np
 
@@ -32,7 +33,9 @@ logger = logging.getLogger()
 def initialize():
     global parser, GRIMM_FILENAME, UNIQUE_GRIMM_FILENAME, BLOCKS_COORD_FILENAME, INFERCARS_FILENAME, STATS_FILE, \
         BALANCED_FOLDER, UNBALANCED_FOLDER, CHARACTERS_FOLDER, TREES_FOLDER, BALANCED_COLORS, UNBALANCED_COLORS, \
-        clustering_proximity_percentile, clustering_threshold, clustering_j, clustering_j, clustering_b
+        clustering_proximity_percentile, clustering_threshold, clustering_j, clustering_j, clustering_b, \
+        CSV_BLOCK_FILENAME, CSV_BLOCK_UNIQUE_FILENAME, CSV_GENOME_LENGTH
+
 
     os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
@@ -64,6 +67,10 @@ def initialize():
 
     BLOCKS_COORD_FILENAME = 'blocks_coords.txt'
     INFERCARS_FILENAME = 'blocks_coords.infercars'
+
+    CSV_BLOCK_FILENAME = 'blocks_coords.csv'
+    CSV_BLOCK_UNIQUE_FILENAME = 'blocks_unique_coords.csv'
+    CSV_GENOME_LENGTH = 'blocks_lengths.csv'
 
     STATS_FILE = 'stats.csv'
     BALANCED_FOLDER = 'balanced_rearrangements_output/'
@@ -100,6 +107,13 @@ def parsers_and_stats():
     blocks_df = parse_infercars_to_df(preprocessed_data_folder + INFERCARS_FILENAME)
     unique_blocks_df = filter_dataframe_unique(blocks_df)
 
+    blocks_df.to_csv(preprocessed_data_folder + CSV_BLOCK_FILENAME, index=False)
+    unique_blocks_df.to_csv(preprocessed_data_folder + CSV_BLOCK_UNIQUE_FILENAME, index=False)
+    with open(preprocessed_data_folder + CSV_GENOME_LENGTH, 'w') as f:
+        w = csv.writer(f)
+        w.writerow(['Genome', 'Length'])
+        w.writerows(genome_lengths.items())
+
     logger.info(f'Blocks count: {len(blocks_df["block"].unique())}')
     logger.info(f'Unique one-copy blocks count: {len(unique_blocks_df["block"].unique())}')
 
@@ -107,7 +121,6 @@ def parsers_and_stats():
     logger.info(f'Mean unique one-copy blocks coverage: {get_mean_coverage(unique_blocks_df, genome_lengths) * 100} %')
 
     tree_holder = TreeHolder(tree_file, logger, labels_dict=make_labels_dict(labels_file))
-
 
     genomes, blocks, block_genome_count = get_genomes_contain_blocks_grimm(blocks_folder + GRIMM_FILENAME)
 

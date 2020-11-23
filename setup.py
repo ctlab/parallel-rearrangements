@@ -8,7 +8,7 @@ long_description = (here / 'README.md').read_text(encoding='utf-8')
 
 setup(
     name='PaReBrick',
-    version='0.1.14',
+    version='0.1.15',
     description='A bioinf tool for finding genome rearrangements in bacterial genomes',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -40,7 +40,9 @@ setup(
     entry_points={
         'console_scripts': [
             'PaReBrick=parebrick.main:main',
+            'parebrick=parebrick.main:main',
             'PaReBrick-Charts=parebrick.drawer:main',
+            'parebrick-charts=parebrick.drawer:main',
         ],
     },
 )
