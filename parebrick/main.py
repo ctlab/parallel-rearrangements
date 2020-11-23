@@ -194,6 +194,9 @@ def unbalanced_rearrangements_stats_and_clustering():
     ub_characters = [char for char, stat in char_stats]
     ub_stats = [stat for char, stat in char_stats]
 
+    if len(ub_stats) == 0:
+        logger.info('There is no non-convex characters, skipping clustering part')
+        return
     logger.info('Counting distances between non-convex character blocks, may take a while')
     distance_between_blocks = distance_between_blocks_dict(blocks_df, genome_lengths, set(map(itemgetter(0), ub_stats)))
     ub_cls = clustering(ub_characters, ub_stats, distance_between_blocks, max(genome_lengths.values()),
@@ -264,7 +267,7 @@ def main():
 
     unbalanced_rearrangements_characters()
     unbalanced_rearrangements_stats_and_clustering()
-    unbalanced_rearrangements_output()
+    if len(ub_stats) != 0: unbalanced_rearrangements_output()
 
     logger.info(f'Total elapsed time: {time() - start_time} seconds')
 
