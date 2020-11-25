@@ -37,8 +37,6 @@ def initialize():
         CSV_BLOCK_FILENAME, CSV_BLOCK_UNIQUE_FILENAME, CSV_GENOME_LENGTH
 
 
-    os.environ['QT_QPA_PLATFORM'] = 'offscreen'
-
     parser = argparse.ArgumentParser(
         description='Based on synteny blocks and phylogenetic tree this tool calls parallel rearrangements.')
 
