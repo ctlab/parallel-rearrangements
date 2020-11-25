@@ -69,13 +69,13 @@ def check_stats_stains(tree, block_genomes, logger):
                 'Seems like strains in block files and in tree leafs have different ids, intersection is empty.')
         left_tree = tree_genomes - (block_genomes & tree_genomes)
         if len(left_tree) > 0:
-            logger.debug('PRUNING TREE')
-            logger.debug(f'Those strains are thrown away from tree because there were not found in blocks data: {", ".join(left_tree)}')
+            logger.warning('PRUNING TREE')
+            logger.warning(f'Those strains are thrown away from tree because there were not found in blocks data: {", ".join(left_tree)}')
             tree.prune(block_genomes & tree_genomes)
         left_blocks = block_genomes - (block_genomes & tree_genomes)
         if len(left_blocks) > 0:
-            logger.debug('FILTERING GENOMES IN BLOCKS')
-            logger.debug(f'Those strains are thrown away from blocks because there were not found in tree leafs: {", ".join(left_blocks)}')
+            logger.warning('FILTERING GENOMES IN BLOCKS')
+            logger.warning(f'Those strains are thrown away from blocks because there were not found in tree leafs: {", ".join(left_blocks)}')
 
     return block_genomes & tree_genomes
 
