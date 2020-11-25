@@ -209,9 +209,12 @@ def unbalanced_rearrangements_stats_and_clustering():
         logger.info('There is no non-convex characters, skipping clustering part')
         return
     logger.info('Counting distances between non-convex character blocks, may take a while')
-    distance_between_blocks = distance_between_blocks_dict(blocks_df, genome_lengths, set(map(itemgetter(0), ub_stats)))
-    ub_cls = clustering(ub_characters, ub_stats, distance_between_blocks, max(genome_lengths.values()),
-                        clustering_threshold, clustering_j, clustering_b, clustering_proximity_percentile, logger)
+    if len(ub_stats) > 1:
+        distance_between_blocks = distance_between_blocks_dict(blocks_df, genome_lengths, set(map(itemgetter(0), ub_stats)))
+        ub_cls = clustering(ub_characters, ub_stats, distance_between_blocks, max(genome_lengths.values()),
+                            clustering_threshold, clustering_j, clustering_b, clustering_proximity_percentile, logger)
+    else:
+        ub_cls = np.array([0])
 
     logger.info(f'Clusters: {np.unique(ub_cls).shape[0]}')
 
