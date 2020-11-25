@@ -3,6 +3,7 @@ import os
 import logging
 import sys
 import csv
+import platform
 
 import numpy as np
 
@@ -36,6 +37,8 @@ def initialize():
         clustering_proximity_percentile, clustering_threshold, clustering_j, clustering_j, clustering_b, \
         CSV_BLOCK_FILENAME, CSV_BLOCK_UNIQUE_FILENAME, CSV_GENOME_LENGTH
 
+    if platform.system() == 'Linux':
+        os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
     parser = argparse.ArgumentParser(
         description='Based on synteny blocks and phylogenetic tree this tool calls parallel rearrangements.')
