@@ -9,7 +9,7 @@ from io import StringIO
 from bg.grimm import GRIMMReader
 from collections import defaultdict, Counter
 
-PATTERN = re.compile("([A-Za-z0-9_\(\)\/\s\.]+)\.([A-Za-z0-9_]+):(\d+)-(\d+) ([+|-]).*")
+PATTERN = re.compile("([A-Za-z0-9_\(\)\/\s\.-]+)\.([A-Za-z0-9_]+):(\d+)-(\d+) ([+|-]).*")
 COLUMNS = ["block", "species", "chr", "chr_beg", "chr_end", "orientation"]
 BLOCKS_SEPARATOR = '-' * 80
 
