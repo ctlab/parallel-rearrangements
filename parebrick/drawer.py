@@ -102,11 +102,11 @@ def scatter_len_genomes_count(log):
     plt.xlim(xmin=0 - 0.02 * (max(xs)), xmax=max(xs) + 0.02 * (max(xs)))
     if not log: plt.ylim(ymin=0)
 
+    plt.tight_layout()
     plt.savefig(out_folder + f'scatter_number_length{"_log" if log else ""}.pdf')
 
     plt.subplots_adjust(left=0.14, right=0.99)
 
-    plt.tight_layout()
     # plt.show()
 
 
