@@ -35,7 +35,9 @@ def initialize():
     global parser, GRIMM_FILENAME, UNIQUE_GRIMM_FILENAME, BLOCKS_COORD_FILENAME, INFERCARS_FILENAME, STATS_FILE, \
         BALANCED_FOLDER, UNBALANCED_FOLDER, CHARACTERS_FOLDER, TREES_FOLDER, BALANCED_COLORS, UNBALANCED_COLORS, \
         clustering_proximity_percentile, clustering_threshold, clustering_j, clustering_j, clustering_b, \
-        CSV_BLOCK_FILENAME, CSV_BLOCK_UNIQUE_FILENAME, CSV_GENOME_LENGTH
+        CSV_BLOCK_FILENAME, CSV_BLOCK_UNIQUE_FILENAME, CSV_GENOME_LENGTH, have_unique
+
+    have_unique = True
 
     if platform.system() == 'Linux':
         os.environ['QT_QPA_PLATFORM'] = 'offscreen'
@@ -102,11 +104,15 @@ def preprocess_data():
 # is checked, if necessary, the missing strains are discarded.
 @decorate("Parsers and check strains", logger)
 def parsers_and_stats():
-    global genome_lengths, blocks_df, tree_holder, genomes, blocks, block_genome_count
+    global genome_lengths, blocks_df, tree_holder, genomes, blocks, block_genome_count, have_unique
 
     genome_lengths = genome_lengths_from_block_coords(blocks_folder + BLOCKS_COORD_FILENAME)
     blocks_df = parse_infercars_to_df(preprocessed_data_folder + INFERCARS_FILENAME)
     unique_blocks_df = filter_dataframe_unique(blocks_df)
+
+    if len(unique_blocks_df) == 0:
+        have_unique = False
+        logger.warning('No unique one-copy blocks found. Balanced rearrangements will not be called')
 
     blocks_df.to_csv(preprocessed_data_folder + CSV_BLOCK_FILENAME, index=False)
     unique_blocks_df.to_csv(preprocessed_data_folder + CSV_BLOCK_UNIQUE_FILENAME, index=False)
@@ -119,7 +125,9 @@ def parsers_and_stats():
     logger.info(f'Unique one-copy blocks count: {len(unique_blocks_df["block"].unique())}')
 
     logger.info(f'Mean block coverage: {get_mean_coverage(blocks_df, genome_lengths) * 100} %')
-    logger.info(f'Mean unique one-copy blocks coverage: {get_mean_coverage(unique_blocks_df, genome_lengths) * 100} %')
+    logger.info(f'Mean unique one-copy blocks coverage: '
+                f'{get_mean_coverage(unique_blocks_df, genome_lengths) * 100 if have_unique else 0} %')
+
 
     tree_holder = TreeHolder(tree_file, logger, labels_dict=make_labels_dict(labels_file))
 
@@ -258,7 +266,8 @@ def main():
             handlers=handlers
         )
 
-    global blocks_folder, output_folder, tree_file, labels_file, preprocessed_data_folder, show_branch_support
+    global blocks_folder, output_folder, tree_file, labels_file, preprocessed_data_folder, show_branch_support, \
+        have_unique
     initialize()
 
     start_time = time()
@@ -278,9 +287,10 @@ def main():
     preprocess_data()
     parsers_and_stats()
 
-    balanced_rearrangements_characters()
-    balanced_rearrangements_stats()
-    balanced_rearrangements_output()
+    if have_unique:
+        balanced_rearrangements_characters()
+        balanced_rearrangements_stats()
+        balanced_rearrangements_output()
 
     unbalanced_rearrangements_characters()
     unbalanced_rearrangements_stats_and_clustering()
