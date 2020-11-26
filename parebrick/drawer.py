@@ -22,7 +22,7 @@ def lengths_between(state, log):
     else:
         ds = distance_between_blocks_distribution(df)
 
-    sns.histplot(ds, bins=100, kde_kws={'log': log, 'alpha': 0.7})
+    sns.histplot(ds, bins=100, log_scale=log, kde_kws={'alpha': 0.7})
 
     plt.ylabel('Number of blocks')
     plt.xlabel('Length in nucleotides')
@@ -46,9 +46,9 @@ def number_of_genomes_weighted(weighted, log):
 
     bins = 100 if max(vs) > 100 else max(vs)
     if weighted:
-        sns.histplot(vs, bins=bins, kde_kws={'log': log, 'alpha': 0.7, 'weights': ws})
+        sns.histplot(vs, bins=bins, log_scale=log, weights=ws, kde_kws={'alpha': 0.7})
     else:
-        sns.histplot(vs, bins=bins, kde_kws={'log': log, 'alpha': 0.7})
+        sns.histplot(vs, bins=bins, log_scale=log, kde_kws={'alpha': 0.7})
 
     plt.ylabel('Length of fragments that are present\n in n genomes, nucleotides'
                if weighted else 'Number of blocks')
@@ -68,8 +68,8 @@ def block_length(log):
     ds_after = blocks_length_dist(df_filtered)
 
     bins = np.linspace(min(ds_before), max(ds_before), 100)
-    sns.histplot(ds_before, bins=bins, kde_kws={'log': log, 'alpha': 0.7}, label='not-common')
-    sns.histplot(ds_after, bins=bins, kde_kws={'log': log, 'alpha': 0.7}, label='common', color='red')
+    sns.histplot(ds_before, bins=bins, log_scale=log, kde_kws={'alpha': 0.7}, label='not-common')
+    sns.histplot(ds_after, bins=bins, log_scale=log, kde_kws={'alpha': 0.7}, label='common', color='red')
 
     plt.ylabel('Number of blocks')
     plt.xlabel('Length in nucleotides')
