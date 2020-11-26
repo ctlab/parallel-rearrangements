@@ -52,11 +52,10 @@ def export_df_to_infercars(df, file_name):
 
 def genome_lengths_from_block_coords(in_file):
     with open(in_file) as f:
-        head_lines = list(takewhile(lambda line: (line != BLOCKS_SEPARATOR + os.linesep)
-                                                 or (line != BLOCKS_SEPARATOR + '\n'), f))
+        head_lines = list(takewhile(lambda line: line != BLOCKS_SEPARATOR + os.linesep, f))
 
     # names of chromosomes
-    df_head = pd.read_csv(StringIO('\n'.join(head_lines)), sep='\t')
+    df_head = pd.read_csv(StringIO(os.linesep.join(head_lines)), sep='\t')
     return {row['Description']: row['Size'] for index, row in df_head.iterrows()}
 
 
