@@ -17,7 +17,7 @@ def renew_index(cls):
 
 def clustering(characters, stats, distance_between_blocks, max_length, threshold, j, b, proximity_percentile, logger):
     J = dist_matrix_similarity(characters)
-    J /= J.max()
+    if J.max() != 0: J /= J.max()
     logger.info('Jaccard index matrix constructed')
 
     B = dist_matrix_proximity(stats, distance_between_blocks, max_length, proximity_percentile)
