@@ -4,6 +4,7 @@ import logging
 import sys
 import csv
 import platform
+import shutil
 
 import numpy as np
 
@@ -276,8 +277,11 @@ def main():
         d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support']
 
     # folders
-    if blocks_folder[:-1] != '/': blocks_folder += '/'
-    if output_folder[:-1] != '/': output_folder += '/'
+    if blocks_folder[-1] != '/': blocks_folder += '/'
+    if output_folder[-1] != '/': output_folder += '/'
+    shutil.rmtree(output_folder, ignore_errors=True)
+    print('Cleaning output folder')
+
 
     preprocessed_data_folder = output_folder + 'preprocessed_data/'
     os.makedirs(preprocessed_data_folder, exist_ok=True)
