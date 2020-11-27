@@ -57,7 +57,7 @@ def write_characters_csv_unbalanced(unique_chars_list, folder):
 
             files = split_filenames(unique_count_blocks)
             for file in full_filenames(files, '.csv'):
-                with open(file, 'w') as f:
+                with open(cl_folder + file, 'w') as f:
                     wtr = csv.writer(f)
                     wtr.writerows(rows)
 
@@ -75,4 +75,4 @@ def write_trees_unbalanced(unique_chars_list, folder, show_branch_support, tree_
                       for i in range(max(unfrozen.values()) + 1)]
             files = split_filenames(unique_count_blocks)
             for file in full_filenames(files, '.pdf'):
-                tree_holder.draw(file, legend_labels=labels, show_branch_support=show_branch_support, colors=colors)
+                tree_holder.draw(cl_folder + file, legend_labels=labels, show_branch_support=show_branch_support, colors=colors)
