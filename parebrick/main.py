@@ -74,7 +74,7 @@ def initialize():
 
     CSV_BLOCK_FILENAME = 'blocks_coords.csv'
     CSV_BLOCK_UNIQUE_FILENAME = 'blocks_unique_coords.csv'
-    CSV_GENOME_LENGTH = 'blocks_lengths.csv'
+    CSV_GENOME_LENGTH = 'genomes_lengths.csv'
 
     STATS_FILE = 'stats.csv'
     BALANCED_FOLDER = 'balanced_rearrangements_output/'
