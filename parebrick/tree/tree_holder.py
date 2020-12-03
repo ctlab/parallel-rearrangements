@@ -24,8 +24,9 @@ class TreeHolder:
                     name_face = TextFace(labels_dict[node.name] if labels_dict else node.name,
                                      fgcolor=node_colors[node.name])
                 except KeyError:
-                    logger.error(f'There is not label for leaf {node.name} is labels file')
-                    raise KeyError('There is not label for leaf {node.name} is labels file')
+                    msg = f'There is not label for leaf {node.name} in labels file'
+                    logger.error(msg)
+                    raise KeyError(msg)
                 node.add_face(name_face, column=0)
 
     def draw(self, file, colors, color_internal_nodes=True, legend_labels=(), show_branch_support=True,
