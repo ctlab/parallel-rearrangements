@@ -44,7 +44,8 @@ def initialize():
         os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
     parser = argparse.ArgumentParser(
-        description='Based on synteny blocks and phylogenetic tree this tool calls parallel rearrangements.')
+        description='Based on synteny blocks and phylogenetic tree this tool calls parallel rearrangements '
+                    '(not consistent with phylogenetic tree).')
 
     required = parser.add_argument_group('Required arguments')
     optional = parser.add_argument_group('Optional arguments')
@@ -60,6 +61,9 @@ def initialize():
 
     optional.add_argument('--show_branch_support', '-sbs', type=bool, default=True,
                           help='Show branch support while tree rendering (ete3 parameter)')
+
+    optional.add_argument('--keep_non_parallel', '-knp', type=bool, default=True,
+                          help='Keep rearrangements that are not parallel in result (consistent with phylogenetic tree)')
 
     clustering_proximity_percentile = 25
     clustering_threshold = 0.125
@@ -148,7 +152,7 @@ def balanced_rearrangements_characters():
 # as well as an estimate of the average distance of the length of the breakdown in the genome in nucleotides.
 @decorate("Balanced rearrangements stats", logger)
 def balanced_rearrangements_stats():
-    global b_characters, b_stats
+    global b_characters, b_stats, keep_consistent
 
     logger.info('Counting distances between unique one-copy blocks, may take a while')
     distance_between_uniq_blocks = distance_between_blocks_dict(blocks_df, genome_lengths, unique_blocks)
@@ -160,13 +164,17 @@ def balanced_rearrangements_stats():
     # [1][3] for vertex1,vertex2,parallel_rear_score, [1][6] for parallel_breakpoint_score, r[0][0] for vertex1
     char_stats = sorted(char_stats, key=lambda r: (r[1][3], r[1][6], r[0][0]), reverse=True)
     # remove convex characters
-    char_stats = list(takewhile(lambda r: r[1][7] > 1, char_stats))
+    if not keep_consistent:
+        char_stats = list(takewhile(lambda r: not r[1][8], char_stats))
+        logger.info(f'Left non-convex characters after filtering: {len(char_stats)}')
+    else:
+        logger.info('Percentage of consistent rearrangements (balanced): '
+                f'{np.mean([r[1][8] for r in char_stats]) * 100} %')
 
     # unzip
     b_characters = [char for char, stat in char_stats]
     b_stats = [stat for char, stat in char_stats]
 
-    logger.info(f'Left non-convex characters after filtering: {len(b_characters)}')
 
 # This module generates the output method files: the file stats.csv with the statistics
 # of balanced rearrangements of all non-convex features.
@@ -209,9 +217,12 @@ def unbalanced_rearrangements_stats_and_clustering():
     # [1][3] for vertex1,vertex2,parallel_rear_score, [1][6] for parallel_breakpoint_score, r[0][0] for vertex1
     char_stats = sorted(char_stats, key=lambda r: (r[1][1], r[1][0]), reverse=True)
     # remove convex characters
-    char_stats = list(takewhile(lambda r: r[1][3] > 1, char_stats))
-
-    logger.info(f'Left non-convex characters after filtering: {len(char_stats)}')
+    if not keep_consistent:
+        char_stats = list(takewhile(lambda r: not r[1][4], char_stats))
+        logger.info(f'Left non-convex characters after filtering: {len(char_stats)}')
+    else:
+        logger.info('Percentage of consistent rearrangements (unbalanced): '
+                    f'{np.mean([r[1][4] for r in char_stats]) * 100} %')
 
     # unzip
     ub_characters = [char for char, stat in char_stats]
@@ -268,13 +279,13 @@ def main():
         )
 
     global blocks_folder, output_folder, tree_file, labels_file, preprocessed_data_folder, show_branch_support, \
-        have_unique
+        have_unique, keep_consistent
     initialize()
 
     start_time = time()
     d = vars(parser.parse_args())
-    blocks_folder, output_folder, tree_file, labels_file, show_branch_support = \
-        d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support']
+    blocks_folder, output_folder, tree_file, labels_file, show_branch_support, keep_consistent = \
+        d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support'], d['keep_non_parallel']
 
     # folders
     if blocks_folder[-1] != '/': blocks_folder += '/'

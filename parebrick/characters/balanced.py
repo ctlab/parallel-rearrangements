@@ -94,13 +94,14 @@ def get_characters_stats_balanced(characters, tree_holder, distance_between_bloc
         white_strains = [strain for strain, color in genome_colors.items() if color == 0]
         mean_break_length = np.mean([distance_between_blocks[(b1, b2)][strain] for strain in white_strains])
 
-        ans.append([v1, v2, int(mean_break_length), score_rear, count_rear, count_all_rear, score_break, count_break])
+        ans.append([v1, v2, int(mean_break_length), score_rear, count_rear, count_all_rear, score_break, count_break,
+                    count_break <= 1])
 
     return ans
 
 def write_stats_csv_balanced(stats, stats_file):
     rows = [['id', 'vertex1', 'vertex2', 'mean_break_length_nucleotide', 'parallel_rear_score', 'parallel_rear_unique_innovation_count',
-            'parallel_rear_all_innovations_count', 'parallel_breakpoint_score', 'parallel_breakpoint_count']] + \
+            'parallel_rear_all_innovations_count', 'parallel_breakpoint_score', 'parallel_breakpoint_count', 'tree_consistent']] + \
           [[i+1] + stat for i, stat in enumerate(stats)]
     with open(stats_file, 'w') as f:
         wtr = csv.writer(f)

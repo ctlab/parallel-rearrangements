@@ -11,7 +11,7 @@ def get_characters_stats_unbalanced(blocks, characters, tree_holder):
         tree_holder.count_innovations_fitch(genome_colors)
 
         score_rear, count_rear, count_all_rear = tree_holder.count_parallel_rearrangements(skip_grey=False)
-        ans.append([block, score_rear, count_rear, count_all_rear])
+        ans.append([block, score_rear, count_rear, count_all_rear, count_all_rear <= 1])
 
     return ans
 
