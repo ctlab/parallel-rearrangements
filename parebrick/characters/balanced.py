@@ -25,13 +25,16 @@ def get_character_by_edge(bg, edge, genomes, neighbour_index):
             v1, v2 = edge.vertex1.name, edge.vertex2.name
             if v1 > v2: v1, v2 = v2, v1
 
-            v1_neighbour = get_neighbour_with_genome(v1, genome)
-            v2_neighbour = get_neighbour_with_genome(v2, genome)
+            try:
+                v1_neighbour = get_neighbour_with_genome(v1, genome)
+                v2_neighbour = get_neighbour_with_genome(v2, genome)
+            except KeyError:
+                return 2
             if bg.get_edge_by_two_vertices(v1_neighbour, v2_neighbour):
                 pair = (v1_neighbour, v2_neighbour)
                 if pair not in possible_edges:
                     possible_edges.append(pair)
-                return 2 + possible_edges.index(pair)
+                return 3 + possible_edges.index(pair)
             else:
                 return 1
 
@@ -73,8 +76,8 @@ def get_characters(grimm_file, genomes, logger):
             genome_colors, neighbour_edges = get_character_by_edge(component_bg, edge, genomes, neighbour_index)
             if white_proportion(genome_colors.values()) < 0.5: continue
 
-            labels = ['edge exists', 'parallel edge doesn\'t exist'] + [f'inversion {v1}-{v2}-{v1n}-{v2n}'
-                                                                        for (v1n, v2n) in neighbour_edges]
+            labels = ['edge exists', 'parallel edge doesn\'t exist', 'some block is not presented'] + \
+                     [f'inversion {v1}-{v2}-{v1n}-{v2n}' for (v1n, v2n) in neighbour_edges]
 
             characters.append((v1, v2, genome_colors, labels))
 

@@ -22,7 +22,8 @@ from parebrick.clustering.clustering import clustering, split_by_cluster
 from parebrick.utils.data.converters import block_coords_to_infercars
 from parebrick.utils.data.parsers import genome_lengths_from_block_coords, parse_infercars_to_df, \
     get_genomes_contain_blocks_grimm, make_labels_dict
-from parebrick.utils.data.unique_gene_filters import grimm_filter_unique_gene, filter_dataframe_unique
+from parebrick.utils.data.unique_gene_filters import grimm_filter_unique_gene, filter_dataframe_unique, \
+    filter_dataframe_allowed
 from parebrick.utils.data.stats import distance_between_blocks_dict, check_stats_stains, get_mean_coverage
 
 from parebrick.utils.decorators import decorate
@@ -65,6 +66,10 @@ def initialize():
     optional.add_argument('--keep_non_parallel', '-knp', type=bool, default=True,
                           help='Keep rearrangements that are not parallel in result (consistent with phylogenetic tree)')
 
+    optional.add_argument('--filter_for_balanced', '-fb', type=float, default=80,
+                          help='Minimal percentage of block occurrences in genomes for balanced rearrangements. '
+                               'All blocks with lower occurrences rate will be removed.')
+
     clustering_proximity_percentile = 25
     clustering_threshold = 0.125
     clustering_j = 0.75
@@ -87,8 +92,9 @@ def initialize():
     CHARACTERS_FOLDER = 'characters/'
     TREES_FOLDER = 'tree_colorings/'
 
-    BALANCED_COLORS = ['White', 'Gainsboro', 'LightGreen', 'LightBlue', 'NavajoWhite', 'LightPink', 'LightCoral', 'Purple',
-                       'Navy', 'Olive', 'Teal', 'SaddleBrown', 'SeaGreen', 'DarkCyan', 'DarkOliveGreen', 'DarkSeaGreen']
+    BALANCED_COLORS = ['White', 'Gainsboro', 'DimGray', 'LightGreen', 'LightBlue', 'NavajoWhite', 'LightPink',
+                       'LightCoral', 'Purple', 'Navy', 'Olive', 'Teal', 'SaddleBrown', 'SeaGreen', 'DarkCyan',
+                       'DarkOliveGreen', 'DarkSeaGreen']
 
     UNBALANCED_COLORS = ['Gainsboro', 'White'] + BALANCED_COLORS[2:]
 
@@ -97,8 +103,9 @@ def initialize():
 # Also filtering blocks in the grimm format for unique single-copy blocks for the breakpoint graph construction.
 @decorate("Preprocess Data", logger)
 def preprocess_data():
-    global unique_blocks
-    unique_blocks = grimm_filter_unique_gene(blocks_folder + GRIMM_FILENAME, preprocessed_data_folder + UNIQUE_GRIMM_FILENAME)
+    global unique_blocks, balanced_block_rate
+    unique_blocks = grimm_filter_unique_gene(blocks_folder + GRIMM_FILENAME,
+                                             preprocessed_data_folder + UNIQUE_GRIMM_FILENAME, balanced_block_rate)
     logger.info('Converting block coords to infercars format')
     block_coords_to_infercars(blocks_folder + BLOCKS_COORD_FILENAME, preprocessed_data_folder + INFERCARS_FILENAME)
 
@@ -109,13 +116,14 @@ def preprocess_data():
 # is checked, if necessary, the missing strains are discarded.
 @decorate("Parsers and check strains", logger)
 def parsers_and_stats():
-    global genome_lengths, blocks_df, tree_holder, genomes, blocks, block_genome_count, have_unique
+    global genome_lengths, blocks_df, tree_holder, genomes, blocks, block_genome_count, have_unique, unique_blocks
 
     genome_lengths = genome_lengths_from_block_coords(blocks_folder + BLOCKS_COORD_FILENAME)
     blocks_df = parse_infercars_to_df(preprocessed_data_folder + INFERCARS_FILENAME)
     unique_blocks_df = filter_dataframe_unique(blocks_df)
+    filted_blocks_df = filter_dataframe_allowed(blocks_df, unique_blocks)
 
-    if len(unique_blocks_df) == 0:
+    if len(filted_blocks_df) == 0:
         have_unique = False
         logger.warning('No unique one-copy blocks found. Balanced rearrangements will not be called')
 
@@ -130,8 +138,10 @@ def parsers_and_stats():
     logger.info(f'Unique one-copy blocks count: {len(unique_blocks_df["block"].unique())}')
 
     logger.info(f'Mean block coverage: {get_mean_coverage(blocks_df, genome_lengths) * 100} %')
-    logger.info(f'Mean unique one-copy blocks coverage: '
+    logger.info(f'Mean common one-copy blocks coverage: '
                 f'{get_mean_coverage(unique_blocks_df, genome_lengths) * 100 if have_unique else 0} %')
+    logger.info(f'Mean {balanced_block_rate} % rate one-copy blocks coverage: '
+                f'{get_mean_coverage(filted_blocks_df, genome_lengths) * 100 if have_unique else 0} %')
 
 
     tree_holder = TreeHolder(tree_file, logger, labels_dict=make_labels_dict(labels_file))
@@ -279,13 +289,13 @@ def main():
         )
 
     global blocks_folder, output_folder, tree_file, labels_file, preprocessed_data_folder, show_branch_support, \
-        have_unique, keep_consistent
+        have_unique, keep_consistent, balanced_block_rate
     initialize()
 
     start_time = time()
     d = vars(parser.parse_args())
-    blocks_folder, output_folder, tree_file, labels_file, show_branch_support, keep_consistent = \
-        d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support'], d['keep_non_parallel']
+    blocks_folder, output_folder, tree_file, labels_file, show_branch_support, keep_consistent, balanced_block_rate = \
+        d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support'], d['keep_non_parallel'], d['filter_for_balanced']
 
     # folders
     if blocks_folder[-1] != '/': blocks_folder += '/'

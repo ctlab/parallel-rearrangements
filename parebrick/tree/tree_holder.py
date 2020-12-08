@@ -109,7 +109,7 @@ class TreeHolder:
     def count_parallel_rearrangements(self, skip_grey):
         score, count, count_all = 0, 0, 0
         for color, nodes in self.innovations.items():
-            if len(nodes) <= 1 or (skip_grey and color == 1): continue
+            if len(nodes) <= 1 or (skip_grey and (color == 1 or color == 2)): continue
             count += 1
             count_all += len(nodes)
             for n1, n2 in combinations(nodes, 2):
