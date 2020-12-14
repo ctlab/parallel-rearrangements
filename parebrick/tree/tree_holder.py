@@ -62,7 +62,7 @@ class TreeHolder:
     def get_all_leafs(self):
         return {node.name for node in self.tree.get_leaves()}
 
-    def count_innovations_fitch(self, leaf_colors):
+    def count_innovations_fitch(self, leaf_colors, count_second_color=True):
         def assign_colorset_feature(v):
             if v.is_leaf():
                 v.add_features(colorset={leaf_colors[v.name]}, color=leaf_colors[v.name])
@@ -89,7 +89,7 @@ class TreeHolder:
 
         def count_innovations(v, innovations):
             for child in v.children:
-                if v.color != child.color:
+                if v.color != child.color and not (not count_second_color and (v.color == 2) or (child.color == 2)):
                     innovations[child.color].append(child)
                 count_innovations(child, innovations)
 
@@ -110,7 +110,7 @@ class TreeHolder:
     def count_parallel_rearrangements(self, skip_grey):
         score, count, count_all = 0, 0, 0
         for color, nodes in self.innovations.items():
-            if len(nodes) <= 1 or (skip_grey and (color == 1 or color == 2)): continue
+            if len(nodes) <= 1 or (skip_grey and color == 1): continue
             count += 1
             count_all += len(nodes)
             for n1, n2 in combinations(nodes, 2):

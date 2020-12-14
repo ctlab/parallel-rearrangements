@@ -96,7 +96,7 @@ def initialize():
                        'LightCoral', 'Purple', 'Navy', 'Olive', 'Teal', 'SaddleBrown', 'SeaGreen', 'DarkCyan',
                        'DarkOliveGreen', 'DarkSeaGreen']
 
-    UNBALANCED_COLORS = ['Gainsboro', 'White'] + BALANCED_COLORS[2:]
+    UNBALANCED_COLORS = ['Gainsboro', 'White'] + BALANCED_COLORS[3:]
 
 # This module converts data from the output data format
 # of Sibelia or Ragout scripts into the infercars format to simplify the subsequent annotation.

@@ -77,7 +77,7 @@ def get_characters(grimm_file, genomes, logger):
             if white_proportion(genome_colors.values()) < 0.5: continue
 
             labels = ['edge exists', 'parallel edge doesn\'t exist', 'some block is not presented'] + \
-                     [f'inversion {v1}-{v2}-{v1n}-{v2n}' for (v1n, v2n) in neighbour_edges]
+                     [f'inversion between {v1}-{v2} and {v1n}-{v2n}' for (v1n, v2n) in neighbour_edges]
 
             characters.append((v1, v2, genome_colors, labels))
 
@@ -86,7 +86,7 @@ def get_characters(grimm_file, genomes, logger):
 def get_characters_stats_balanced(characters, tree_holder, distance_between_blocks):
     ans = []
     for v1, v2, genome_colors, labels in characters:
-        tree_holder.count_innovations_fitch(genome_colors)
+        tree_holder.count_innovations_fitch(genome_colors, count_second_color=False)
 
         b1, b2 = int(v1[:-1]), int(v2[:-1])
         if b1 > b2: b1, b2 = b2, b1
