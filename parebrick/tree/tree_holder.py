@@ -33,10 +33,12 @@ class TreeHolder:
              show_scale=True, legend_scale=1, mode="c"):
         max_color = len(colors)
 
+        used_colors = set()
         for node in self.tree.traverse():
             if not (color_internal_nodes or node.is_leaf()): continue
             color = colors[min(node.color, max_color - 1)]
             node.img_style['bgcolor'] = color
+            used_colors.add(color)
 
         ts = TreeStyle()
         ts.mode = mode
@@ -51,6 +53,7 @@ class TreeHolder:
         current_colors = colors[0:cur_max_color + 1]
 
         for i, (label, color_) in enumerate(zip(legend_labels, current_colors)):
+            if color_ not in used_colors: continue
             ts.legend.add_face(CircleFace(24 * legend_scale, color_), column=0)
             ts.legend.add_face(CircleFace(13 * legend_scale, 'White'), column=1)
             ts.legend.add_face(TextFace(label, fsize=53 * legend_scale), column=2)
