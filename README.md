@@ -86,10 +86,15 @@ git clone https://github.com/ctlab/parallel-rearrangements
 
 Change directory to data folder:
 ```bash
-cd parallel-rearrangements/example-data/e_coli
+cd parallel-rearrangements/example-data/streptococcus_pyogenes/input
 ```
 
 Running tool on example input:
 ```
-PaReBrick -t input/tree.nwk -b input/maf2synteny-output/ -l input/labels.csv
+PaReBrick -t tree.nwk -b maf2synteny-output -l labels.csv
+```
+
+Or with minimal required arguments (no labels):
+```
+PaReBrick -t tree.nwk -b maf2synteny-output
 ```
