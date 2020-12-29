@@ -1,4 +1,4 @@
-from ete3 import Tree, TreeStyle, TextFace, CircleFace
+from ete3 import Tree, TreeStyle, TextFace, CircleFace, RectFace
 
 from collections import defaultdict, Counter
 from itertools import combinations
@@ -54,12 +54,17 @@ class TreeHolder:
 
         for i, (label, color_) in enumerate(zip(legend_labels, current_colors)):
             if color_ not in used_colors: continue
-            ts.legend.add_face(CircleFace(24 * legend_scale, color_), column=0)
-            ts.legend.add_face(CircleFace(13 * legend_scale, 'White'), column=1)
-            ts.legend.add_face(TextFace(label, fsize=53 * legend_scale), column=2)
-            ts.legend.add_face(CircleFace(13 * legend_scale, 'White'), column=3)
+            rf = RectFace(20 * legend_scale, 16 * legend_scale, color_, color_)
+            rf.inner_border.width = 1
+            rf.margin_right = 14
+            rf.margin_left = 14
 
-        # self.tree.render("ete_tree.pdf", dpi=300, tree_style=ts)
+            tf = TextFace(label, fsize=26 * legend_scale)
+            tf.margin_right = 14
+
+            ts.legend.add_face(rf, column=0)
+            ts.legend.add_face(tf, column=1)
+
         self.tree.render(file, w=1000, tree_style=ts)
 
     def get_all_leafs(self):
