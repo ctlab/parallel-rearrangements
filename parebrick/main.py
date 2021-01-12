@@ -32,6 +32,16 @@ from parebrick.tree.tree_holder import TreeHolder
 
 logger = logging.getLogger()
 
+def str2bool(v):
+    if isinstance(v, bool):
+       return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
 # argument parsing
 def initialize():
     global parser, GRIMM_FILENAME, UNIQUE_GRIMM_FILENAME, BLOCKS_COORD_FILENAME, INFERCARS_FILENAME, STATS_FILE, \
@@ -60,10 +70,10 @@ def initialize():
     optional.add_argument('--labels', '-l', default='',
                           help='Path to csv file with tree labels, must contain two columns: `strain` and `label`.')
 
-    optional.add_argument('--show_branch_support', '-sbs', type=bool, default=True,
+    optional.add_argument('--show_branch_support', '-sbs', type=str2bool, default=False, const=True, nargs='?',
                           help='Show branch support while tree rendering (ete3 parameter)')
 
-    optional.add_argument('--keep_non_parallel', '-knp', type=bool, default=True,
+    optional.add_argument('--keep_non_parallel', '-knp', type=str2bool, default=True,
                           help='Keep rearrangements that are not parallel in result (consistent with phylogenetic tree)')
 
     optional.add_argument('--filter_for_balanced', '-fb', type=float, default=80,
@@ -322,6 +332,7 @@ def main():
     if len(ub_stats) != 0: unbalanced_rearrangements_output()
 
     logger.info(f'Total elapsed time: {time() - start_time} seconds')
+    print(show_branch_support)
 
 
 if __name__ == "__main__":
