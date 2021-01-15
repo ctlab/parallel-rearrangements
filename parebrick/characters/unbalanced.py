@@ -1,6 +1,8 @@
 import csv
 import os
 
+from statistics import mean
+
 from collections import defaultdict
 from textwrap import wrap
 
@@ -11,14 +13,15 @@ def get_characters_stats_unbalanced(blocks, characters, tree_holder):
         tree_holder.count_innovations_fitch(genome_colors)
 
         score_rear, count_rear, count_all_rear = tree_holder.count_parallel_rearrangements(skip_grey=False)
-        ans.append([block, score_rear, count_rear, count_all_rear, count_all_rear <= 1])
+        mean_copies = mean(genome_colors.values())
+        ans.append([block, score_rear, count_rear, count_all_rear, mean_copies, count_all_rear <= 1])
 
     return ans
 
 
 def write_stats_csv_unbalanced(stats, cls, stats_file):
     rows = [['block', 'cluster', 'parallel_rear_score', 'parallel_rear_unique_innovation_count',
-             'parallel_rear_all_innovations_count', 'tree_consistent']] + \
+             'parallel_rear_all_innovations_count', 'mean_copies', 'tree_consistent']] + \
            [stat[0:1] + [cl] + stat[1:] for stat, cl in zip(stats, cls)]
     with open(stats_file, 'w') as f:
         wtr = csv.writer(f)

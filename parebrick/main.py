@@ -16,12 +16,13 @@ from parebrick.characters.balanced import get_characters, write_characters_csv_b
     write_trees_balanced, write_stats_csv_balanced
 from parebrick.characters.unbalanced import get_characters_stats_unbalanced, write_stats_csv_unbalanced, \
     write_characters_csv_unbalanced, call_unique_characters, write_trees_unbalanced
+from parebrick.characters.neighbours import write_trees_neightbours
 
 from parebrick.clustering.clustering import clustering, split_by_cluster
 
 from parebrick.utils.data.converters import block_coords_to_infercars
 from parebrick.utils.data.parsers import genome_lengths_from_block_coords, parse_infercars_to_df, \
-    get_genomes_contain_blocks_grimm, make_labels_dict
+    get_genomes_contain_blocks_grimm, make_labels_dict, get_block_neighbours
 from parebrick.utils.data.unique_gene_filters import grimm_filter_unique_gene, filter_dataframe_unique, \
     filter_dataframe_allowed
 from parebrick.utils.data.stats import distance_between_blocks_dict, check_stats_stains, get_mean_coverage
@@ -47,7 +48,7 @@ def initialize():
     global parser, GRIMM_FILENAME, UNIQUE_GRIMM_FILENAME, BLOCKS_COORD_FILENAME, INFERCARS_FILENAME, STATS_FILE, \
         BALANCED_FOLDER, UNBALANCED_FOLDER, CHARACTERS_FOLDER, TREES_FOLDER, BALANCED_COLORS, UNBALANCED_COLORS, \
         clustering_proximity_percentile, clustering_threshold, clustering_j, clustering_j, clustering_b, \
-        CSV_BLOCK_FILENAME, CSV_BLOCK_UNIQUE_FILENAME, CSV_GENOME_LENGTH, have_unique
+        CSV_BLOCK_FILENAME, CSV_BLOCK_UNIQUE_FILENAME, CSV_GENOME_LENGTH, have_unique, NEIGHBOURS_FOLDER
 
     have_unique = True
 
@@ -80,6 +81,9 @@ def initialize():
                           help='Minimal percentage of block occurrences in genomes for balanced rearrangements. '
                                'All blocks with lower occurrences rate will be removed.')
 
+    optional.add_argument('--visualize_neighbours', '-vn', type=str2bool, default=True,
+                          help='Use module for visualizing neighbours.')
+
     clustering_proximity_percentile = 25
     clustering_threshold = 0.125
     clustering_j = 0.75
@@ -98,6 +102,7 @@ def initialize():
     STATS_FILE = 'stats.csv'
     BALANCED_FOLDER = 'balanced_rearrangements_output/'
     UNBALANCED_FOLDER = 'un' + BALANCED_FOLDER
+    NEIGHBOURS_FOLDER = 'neighbours_output/'
 
     CHARACTERS_FOLDER = 'characters/'
     TREES_FOLDER = 'tree_colorings/'
@@ -126,12 +131,14 @@ def preprocess_data():
 # is checked, if necessary, the missing strains are discarded.
 @decorate("Parsers and check strains", logger)
 def parsers_and_stats():
-    global genome_lengths, blocks_df, tree_holder, genomes, blocks, block_genome_count, have_unique, unique_blocks
+    global genome_lengths, blocks_df, tree_holder, genomes, blocks, block_genome_count, have_unique, unique_blocks, \
+        neighbours
 
     genome_lengths = genome_lengths_from_block_coords(blocks_folder + BLOCKS_COORD_FILENAME)
     blocks_df = parse_infercars_to_df(preprocessed_data_folder + INFERCARS_FILENAME)
     unique_blocks_df = filter_dataframe_unique(blocks_df)
     filted_blocks_df = filter_dataframe_allowed(blocks_df, unique_blocks)
+    neighbours = get_block_neighbours(blocks_folder + GRIMM_FILENAME)
 
     if len(filted_blocks_df) == 0:
         have_unique = False
@@ -285,6 +292,13 @@ def unbalanced_rearrangements_output():
     trees_folder = unbalanced_folder + TREES_FOLDER
     write_trees_unbalanced(unique_chars_list, trees_folder, show_branch_support, tree_holder, UNBALANCED_COLORS)
 
+@decorate('Visualize neighbours output', logger)
+def neighbours_output():
+    neighbours_folder = output_folder + NEIGHBOURS_FOLDER
+    os.makedirs(neighbours_folder, exist_ok=True)
+
+    write_trees_neightbours([s[0] for s in ub_stats], ub_characters, neighbours, neighbours_folder, show_branch_support, tree_holder, UNBALANCED_COLORS)
+
 
 def main():
     def logger_initialize():
@@ -304,8 +318,9 @@ def main():
 
     start_time = time()
     d = vars(parser.parse_args())
-    blocks_folder, output_folder, tree_file, labels_file, show_branch_support, keep_consistent, balanced_block_rate = \
-        d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support'], d['keep_non_parallel'], d['filter_for_balanced']
+    blocks_folder, output_folder, tree_file, labels_file, show_branch_support, keep_consistent, balanced_block_rate, \
+        visualize_neighbours = d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support'], \
+                               d['keep_non_parallel'], d['filter_for_balanced'], d['visualize_neighbours']
 
     # folders
     if blocks_folder[-1] != '/': blocks_folder += '/'
@@ -331,8 +346,10 @@ def main():
     unbalanced_rearrangements_stats_and_clustering()
     if len(ub_stats) != 0: unbalanced_rearrangements_output()
 
+    if visualize_neighbours:
+        neighbours_output()
+
     logger.info(f'Total elapsed time: {time() - start_time} seconds')
-    print(show_branch_support)
 
 
 if __name__ == "__main__":

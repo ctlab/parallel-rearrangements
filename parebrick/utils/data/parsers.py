@@ -77,6 +77,32 @@ def get_genomes_contain_blocks_grimm(grimm_file):
 
     return list(sorted(genomes)), list(sorted(blocks)), block_genome_count
 
+
+def get_block_neighbours(grimm_file):
+    block_neighbours = defaultdict(lambda: defaultdict(list))
+    with open(grimm_file) as f: ls = f.readlines()
+
+    i = 0
+    while i < len(ls):
+        l = ls[i]
+        if GRIMMReader.is_genome_declaration_string(l):
+            genome = GRIMMReader.parse_genome_declaration_string(l)
+            data_line = ls[i + 1]
+            bs = GRIMMReader.parse_data_string(data_line)[1]
+
+            for (prev_or, prev_block), (curr_or, curr_block), (next_or, next_block) in zip(bs, bs[1:] + bs[:1], bs[2:] + bs[:2]):
+                neighbours = (prev_block + ('h' if prev_or == '+' else 't'), next_block + ('t' if next_or == '+' else 'h'))
+                if curr_or == '-':
+                    neighbours = (neighbours[1], neighbours[0])
+                block_neighbours[int(curr_block)][genome.name].append(neighbours)
+
+            i += 2
+        else:
+            i += 1
+
+    return block_neighbours
+
+
 def make_labels_dict(file, row_from='strain', row_to='label'):
     try:
         df = pd.read_csv(file)

@@ -1,7 +1,35 @@
-from ete3 import Tree, TreeStyle, TextFace, CircleFace, RectFace
+from ete3 import Tree, TreeStyle, TextFace, RectFace, SeqMotifFace
 
 from collections import defaultdict, Counter
 from itertools import combinations
+
+
+def get_neighbour_motifs(n, ns_colors, offset, inverse=False):
+    block, orient = n[:-1], n[-1]
+    clr = ns_colors[block]
+
+    if (orient == 'h' and not inverse) or (inverse and orient == 't'):
+        return [[offset, offset + 30, "[]", None, 10, clr, clr, f"arial|2|white|+{block}"],
+                [offset + 30, offset + 40, ">", None, 10, clr, clr, None]]
+    else:
+        return [[offset, offset + 10, "<", None, 10, clr, clr, None],
+                [offset + 10, offset + 40, "[]", None, 10, clr, clr, f"arial|2|white|-{block}"]]
+
+
+def generate_neighbour_face(node_ns, ns_colors, block):
+    motifs = [[0, 0, "blank", None, 10, None, None, None]]
+
+    for i, (nbr1, nbr2) in enumerate(sorted(node_ns)):
+        offset = 160 * i
+
+        motifs.extend(get_neighbour_motifs(nbr1, ns_colors, offset))
+        motifs.extend(get_neighbour_motifs(f'{block}h', ns_colors, offset + 50))
+        motifs.extend(get_neighbour_motifs(nbr2, ns_colors, offset + 100, True))
+
+        motifs.append([offset + 140, offset + 160, "blank", None, 10, None, None, None])
+
+    return SeqMotifFace('', motifs=motifs)
+
 
 class TreeHolder:
     def __init__(self, tree, logger, scale=None, labels_dict=None, node_colors=defaultdict(lambda: 'black')):
@@ -22,15 +50,30 @@ class TreeHolder:
             if node.is_leaf():
                 try:
                     name_face = TextFace(labels_dict[node.name] if labels_dict else node.name,
-                                     fgcolor=node_colors[node.name])
+                                         fgcolor=node_colors[node.name])
                 except KeyError:
                     msg = f'There is not label for leaf {node.name} in labels file'
                     logger.error(msg)
                     raise KeyError(msg)
-                node.add_face(name_face, column=0)
+                node.add_face(name_face, column=1)
+
+    def draw_neighbours(self, neighbours, block, colors=['Crimson', 'Teal', 'DarkGreen', 'Purple', 'DarkKhaki',
+                                                         'MediumVioletRed', 'DarkOrange', 'Navy', 'RosyBrown',
+                                                         'DarkGoldenrod', 'Sienna', 'Indigo', 'DarkRed', 'Olive', 'Black']):
+        posible_ns = sorted(list(set(n[:-1] for nss in neighbours.values() for ns in nss for n in ns)))
+
+        ns_colors = {posible_ns[i]: colors[i % len(colors)] for i in range(len(posible_ns))}
+        ns_colors[str(block)] = 'grey'
+
+        # if block != 2: return
+
+        for node in self.tree.traverse():
+            if not node.is_leaf(): continue
+            face = generate_neighbour_face(sorted(neighbours[node.name]), ns_colors, block)
+            node.add_face(face, 0, "aligned")
 
     def draw(self, file, colors, color_internal_nodes=True, legend_labels=(), show_branch_support=True,
-             show_scale=True, legend_scale=1, mode="c"):
+             show_scale=True, legend_scale=1, mode="c", neighbours=None, neighbours_block=None):
         max_color = len(colors)
 
         used_colors = set()
@@ -65,7 +108,14 @@ class TreeHolder:
             ts.legend.add_face(rf, column=0)
             ts.legend.add_face(tf, column=1)
 
+        if neighbours:
+            old_tree = self.tree.copy()
+            self.draw_neighbours(neighbours, neighbours_block)
+
         self.tree.render(file, w=1000, tree_style=ts)
+
+        if neighbours:
+            self.tree = old_tree
 
     def get_all_leafs(self):
         return {node.name for node in self.tree.get_leaves()}
