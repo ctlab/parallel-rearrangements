@@ -8,7 +8,7 @@ def dist_matrix_similarity(characters):
         for i2, char2 in enumerate(characters):
             if i1 >= i2: continue
             arr[i1, i2] = arr[i2, i1] = \
-                sum(char1[genome] != char2[genome] for genome in char1.keys() | char2.keys())
+                sum(abs(char1[genome] - char2[genome]) for genome in char1.keys() | char2.keys())
 
     return arr
 

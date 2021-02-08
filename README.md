@@ -1,4 +1,4 @@
-# PaReBrick (Parallel Rearrangement and Breakpoints)
+# PaReBrick (Parallel Rearrangements and Breakpoints identification toolkit)
 
 ---
 ## Project goals

@@ -55,7 +55,7 @@ class TreeHolder:
                     msg = f'There is not label for leaf {node.name} in labels file'
                     logger.error(msg)
                     raise KeyError(msg)
-                node.add_face(name_face, column=1)
+                node.add_face(name_face, column=0)
 
     def draw_neighbours(self, neighbours, block, colors=['Crimson', 'Teal', 'DarkGreen', 'Purple', 'DarkKhaki',
                                                          'MediumVioletRed', 'DarkOrange', 'Navy', 'RosyBrown',
@@ -70,7 +70,7 @@ class TreeHolder:
         for node in self.tree.traverse():
             if not node.is_leaf(): continue
             face = generate_neighbour_face(sorted(neighbours[node.name]), ns_colors, block)
-            node.add_face(face, 0, "aligned")
+            node.add_face(face, 1, "aligned")
 
     def draw(self, file, colors, color_internal_nodes=True, legend_labels=(), show_branch_support=True,
              show_scale=True, legend_scale=1, mode="c", neighbours=None, neighbours_block=None):

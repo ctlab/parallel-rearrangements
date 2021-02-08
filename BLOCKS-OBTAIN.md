@@ -15,6 +15,7 @@ conda install sibeliaz -c bionconda
 ## 2) Running SibeliaZ Alignment
 We recommend to use some parameters: 
 * `-k 15` k-mer size for bacterial size genomes (recommended in SibeliaZ documentation for bacterial genomes);
+* `-a N*20` where `N` is the number of genomes, for detecting highly duplicated blocks (20 equal to 10 duplications within genome).
 * `-n` to skip the alignment with nucleotides and only output coordinates of the alignment saving time and memory;
 * `-t 4` optional, for desired threads number;
 * **Do not change `-m` parameter**. 

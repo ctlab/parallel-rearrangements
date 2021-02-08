@@ -103,8 +103,8 @@ def get_characters_stats_balanced(characters, tree_holder, distance_between_bloc
     return ans
 
 def write_stats_csv_balanced(stats, stats_file):
-    rows = [['id', 'vertex1', 'vertex2', 'mean_break_length_nucleotide', 'parallel_rear_score', 'parallel_rear_unique_innovation_count',
-            'parallel_rear_all_innovations_count', 'parallel_breakpoint_score', 'parallel_breakpoint_count', 'tree_consistent']] + \
+    rows = [['id', 'vertex1', 'vertex2', 'mean_break_length_nucleotide', 'parallel_rear_score', 'number_of_inconsistent_colors',
+            'number_of_parallel_events', 'parallel_break_score', 'number_of_parallel_breaks', 'tree_consistent']] + \
           [[i+1] + stat for i, stat in enumerate(stats)]
     with open(stats_file, 'w') as f:
         wtr = csv.writer(f)

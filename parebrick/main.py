@@ -67,22 +67,22 @@ def initialize():
     required.add_argument('--blocks_folder', '-b', required=True,
                         help='Path to folder with blocks resulted as output of original Sibelia or maf2synteny tool.')
 
-    optional.add_argument('--output', '-o', default='parebrick_output', help='Path to output folder.')
+    optional.add_argument('--output', '-o', default='parebrick_output', help='Path to output folder. Default: parebrick_output.')
     optional.add_argument('--labels', '-l', default='',
                           help='Path to csv file with tree labels, must contain two columns: `strain` and `label`.')
 
     optional.add_argument('--show_branch_support', '-sbs', type=str2bool, default=False, const=True, nargs='?',
-                          help='Show branch support while tree rendering (ete3 parameter)')
+                          help='Show branch support while tree rendering (ete3 parameter). Default: False.')
 
     optional.add_argument('--keep_non_parallel', '-knp', type=str2bool, default=True,
-                          help='Keep rearrangements that are not parallel in result (consistent with phylogenetic tree)')
+                          help='Keep rearrangements that are not parallel in result (consistent with phylogenetic tree). Default: True.')
 
     optional.add_argument('--filter_for_balanced', '-fb', type=float, default=80,
                           help='Minimal percentage of block occurrences in genomes for balanced rearrangements. '
-                               'All blocks with lower occurrences rate will be removed.')
+                               'All blocks with lower occurrences rate will be removed. Default: 80.')
 
     optional.add_argument('--visualize_neighbours', '-vn', type=str2bool, default=True,
-                          help='Use module for visualizing neighbours.')
+                          help='Use module for visualizing neighbours. Default: True.')
 
     clustering_proximity_percentile = 25
     clustering_threshold = 0.125
@@ -107,9 +107,8 @@ def initialize():
     CHARACTERS_FOLDER = 'characters/'
     TREES_FOLDER = 'tree_colorings/'
 
-    BALANCED_COLORS = ['White', 'Gainsboro', 'DimGray', 'LightGreen', 'LightBlue', 'NavajoWhite', 'LightPink',
-                       'LightCoral', 'Purple', 'Navy', 'Olive', 'Teal', 'SaddleBrown', 'SeaGreen', 'DarkCyan',
-                       'DarkOliveGreen', 'DarkSeaGreen']
+    BALANCED_COLORS = ['White', 'Gainsboro', 'DimGray', 'DarkOliveGreen', 'DarkSeaGreen', 'NavajoWhite', 'LightGreen',
+                       'LightBlue', 'Purple', 'Navy', 'Olive', 'Teal', 'SaddleBrown', 'SeaGreen', 'DarkCyan']
 
     UNBALANCED_COLORS = ['Gainsboro', 'White'] + BALANCED_COLORS[3:]
 

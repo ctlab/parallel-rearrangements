@@ -20,8 +20,8 @@ def get_characters_stats_unbalanced(blocks, characters, tree_holder):
 
 
 def write_stats_csv_unbalanced(stats, cls, stats_file):
-    rows = [['block', 'cluster', 'parallel_rear_score', 'parallel_rear_unique_innovation_count',
-             'parallel_rear_all_innovations_count', 'mean_copies', 'tree_consistent']] + \
+    rows = [['block', 'cluster', 'parallel_rear_score', 'number_of_inconsistent_colors', 'number_of_parallel_events',
+             'mean_copies', 'tree_consistent']] + \
            [stat[0:1] + [cl] + stat[1:] for stat, cl in zip(stats, cls)]
     with open(stats_file, 'w') as f:
         wtr = csv.writer(f)
