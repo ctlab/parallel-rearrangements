@@ -33,15 +33,17 @@ from parebrick.tree.tree_holder import TreeHolder
 
 logger = logging.getLogger()
 
+
 def str2bool(v):
     if isinstance(v, bool):
-       return v
+        return v
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
         return True
     elif v.lower() in ('no', 'false', 'f', 'n', '0'):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
+
 
 # argument parsing
 def initialize():
@@ -63,11 +65,12 @@ def initialize():
     optional = parser.add_argument_group('Optional arguments')
 
     required.add_argument('--tree', '-t', required=True, help='Tree in newick format, must be parsable by ete3 library.'
-                                                            'You can read more about formats supported by ete3 at http://etetoolkit.org/docs/latest/tutorial/tutorial_trees.html#reading-and-writing-newick-trees')
+                                                              'You can read more about formats supported by ete3 at http://etetoolkit.org/docs/latest/tutorial/tutorial_trees.html#reading-and-writing-newick-trees')
     required.add_argument('--blocks_folder', '-b', required=True,
-                        help='Path to folder with blocks resulted as output of original Sibelia or maf2synteny tool.')
+                          help='Path to folder with blocks resulted as output of original Sibelia or maf2synteny tool.')
 
-    optional.add_argument('--output', '-o', default='parebrick_output', help='Path to output folder. Default: parebrick_output.')
+    optional.add_argument('--output', '-o', default='parebrick_output',
+                          help='Path to output folder. Default: parebrick_output.')
     optional.add_argument('--labels', '-l', default='',
                           help='Path to csv file with tree labels, must contain two columns: `strain` and `label`.')
 
@@ -113,6 +116,7 @@ def initialize():
 
     UNBALANCED_COLORS = ['Gainsboro', 'White'] + BALANCED_COLORS[3:]
 
+
 # This module converts data from the output data format
 # of Sibelia or Ragout scripts into the infercars format to simplify the subsequent annotation.
 # Also filtering blocks in the grimm format for unique single-copy blocks for the breakpoint graph construction.
@@ -123,6 +127,7 @@ def preprocess_data():
                                              preprocessed_data_folder + UNIQUE_GRIMM_FILENAME, balanced_block_rate)
     logger.info('Converting block coords to infercars format')
     block_coords_to_infercars(blocks_folder + BLOCKS_COORD_FILENAME, preprocessed_data_folder + INFERCARS_FILENAME)
+
 
 # In this module, parsing of input blocks and their coordinates, as well as a phylogenetic, takes place.
 # Next, some statistics are calculated: the total number of blocks,
@@ -166,12 +171,14 @@ def parsers_and_stats():
 
     genomes = check_stats_stains(tree_holder, set(genomes), logger)
 
+
 # In this module, the breakpoint of the graph is built using the bg library,
 # then an algorithm for constructing characters and their states for each edge of the breakpoint graph is implemented.
 @decorate("Balanced rearrangements characters", logger)
 def balanced_rearrangements_characters():
     global b_characters
     b_characters = get_characters(preprocessed_data_folder + UNIQUE_GRIMM_FILENAME, genomes, logger)
+
 
 # This module implements balanced rearrangements characters statistics calculation
 # (measure for non-convexity proposed in the paper),
@@ -195,7 +202,7 @@ def balanced_rearrangements_stats():
         logger.info(f'Left non-convex characters after filtering: {len(char_stats)}')
     else:
         logger.info('Percentage of consistent rearrangements (balanced): '
-                f'{np.mean([r[1][8] for r in char_stats]) * 100} %')
+                    f'{np.mean([r[1][8] for r in char_stats]) * 100} %')
 
     # unzip
     b_characters = [char for char, stat in char_stats]
@@ -221,12 +228,14 @@ def balanced_rearrangements_output():
     trees_folder = balanced_folder + TREES_FOLDER
     write_trees_balanced(b_characters, trees_folder, show_branch_support, tree_holder, BALANCED_COLORS)
 
+
 # In this module, the mapping of blocks by its number for each strain is performed.
 @decorate("Unbalanced rearrangements characters", logger)
 def unbalanced_rearrangements_characters():
     global ub_characters
     ub_characters = [{genome: block_genome_count[block][genome] for genome in genomes}
                      for block in blocks]
+
 
 # This module implements balanced rearrangements characters statistics calculation
 # (measure for non-convexity proposed in the paper),
@@ -259,13 +268,15 @@ def unbalanced_rearrangements_stats_and_clustering():
         return
     logger.info('Counting distances between non-convex character blocks, may take a while')
     if len(ub_stats) > 1:
-        distance_between_blocks = distance_between_blocks_dict(blocks_df, genome_lengths, set(map(itemgetter(0), ub_stats)))
+        distance_between_blocks = distance_between_blocks_dict(blocks_df, genome_lengths,
+                                                               set(map(itemgetter(0), ub_stats)))
         ub_cls = clustering(ub_characters, ub_stats, distance_between_blocks, max(genome_lengths.values()),
                             clustering_threshold, clustering_j, clustering_b, clustering_proximity_percentile, logger)
     else:
         ub_cls = np.array([0])
 
     logger.info(f'Clusters: {np.unique(ub_cls).shape[0]}')
+
 
 # In this module, the output of the method files is generated: the file stats.csv with the statistics of unbalanced
 # genomic rearrangements of all non-convex characters.
@@ -291,12 +302,14 @@ def unbalanced_rearrangements_output():
     trees_folder = unbalanced_folder + TREES_FOLDER
     write_trees_unbalanced(unique_chars_list, trees_folder, show_branch_support, tree_holder, UNBALANCED_COLORS)
 
+
 @decorate('Visualize neighbours output', logger)
 def neighbours_output():
     neighbours_folder = output_folder + NEIGHBOURS_FOLDER
     os.makedirs(neighbours_folder, exist_ok=True)
 
-    write_trees_neightbours([s[0] for s in ub_stats], ub_characters, neighbours, neighbours_folder, show_branch_support, tree_holder, UNBALANCED_COLORS)
+    write_trees_neightbours([s[0] for s in ub_stats], ub_characters, neighbours, neighbours_folder, show_branch_support,
+                            tree_holder, UNBALANCED_COLORS)
 
 
 def main():
@@ -318,15 +331,14 @@ def main():
     start_time = time()
     d = vars(parser.parse_args())
     blocks_folder, output_folder, tree_file, labels_file, show_branch_support, keep_consistent, balanced_block_rate, \
-        visualize_neighbours = d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support'], \
-                               d['keep_non_parallel'], d['filter_for_balanced'], d['visualize_neighbours']
+    visualize_neighbours = d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support'], \
+                           d['keep_non_parallel'], d['filter_for_balanced'], d['visualize_neighbours']
 
     # folders
     if blocks_folder[-1] != '/': blocks_folder += '/'
     if output_folder[-1] != '/': output_folder += '/'
     shutil.rmtree(output_folder, ignore_errors=True)
     print('Cleaning output folder')
-
 
     preprocessed_data_folder = output_folder + 'preprocessed_data/'
     os.makedirs(preprocessed_data_folder, exist_ok=True)
