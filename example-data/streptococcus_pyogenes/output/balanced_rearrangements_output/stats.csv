@@ -1,4 +1,4 @@
-id,vertex1,vertex2,mean_break_length_nucleotide,parallel_rear_score,parallel_rear_unique_innovation_count,parallel_rear_all_innovations_count,parallel_breakpoint_score,parallel_breakpoint_count,tree_consistent
+id,vertex1,vertex2,mean_break_length_nucleotide,parallel_rear_score,number_of_inconsistent_colors,number_of_parallel_events,parallel_break_score,number_of_parallel_breaks,tree_consistent
 1,94h,95t,6415,0.5139719178400601,2,12,1.0212069172523475,12,False
 2,17h,18t,7787,0.5139719178400601,2,12,1.0212069172523475,12,False
 3,101h,102t,1630,0.00014485075508392388,1,3,0.05793811514437251,4,False

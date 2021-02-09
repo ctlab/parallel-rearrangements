@@ -89,8 +89,8 @@ def initialize():
 
     clustering_proximity_percentile = 25
     clustering_threshold = 0.04
-    clustering_j = 0.75
-    clustering_b = 0.25
+    clustering_j = 0.8
+    clustering_b = 0.2
 
     GRIMM_FILENAME = 'genomes_permutations.txt'
     UNIQUE_GRIMM_FILENAME = 'genomes_permutations_unique.txt'
