@@ -107,8 +107,9 @@ def initialize():
     CHARACTERS_FOLDER = 'characters/'
     TREES_FOLDER = 'tree_colorings/'
 
-    BALANCED_COLORS = ['White', 'Gainsboro', 'DimGray', 'DarkOliveGreen', 'DarkSeaGreen', 'NavajoWhite', 'LightGreen',
-                       'LightBlue', 'Purple', 'Navy', 'Olive', 'Teal', 'SaddleBrown', 'SeaGreen', 'DarkCyan']
+    BALANCED_COLORS = ['White', 'Gainsboro', 'DimGray', 'LightGreen', 'LightBlue', 'NavajoWhite', 'LightPink',
+                       'DarkSeaGreen', 'Purple', 'Navy', 'Olive', 'Teal', 'SaddleBrown', 'SeaGreen', 'DarkCyan',
+                       'DarkOliveGreen', 'LightCoral']
 
     UNBALANCED_COLORS = ['Gainsboro', 'White'] + BALANCED_COLORS[3:]
 
@@ -158,7 +159,6 @@ def parsers_and_stats():
                 f'{get_mean_coverage(unique_blocks_df, genome_lengths) * 100 if have_unique else 0} %')
     logger.info(f'Mean {balanced_block_rate} % rate one-copy blocks coverage: '
                 f'{get_mean_coverage(filted_blocks_df, genome_lengths) * 100 if have_unique else 0} %')
-
 
     tree_holder = TreeHolder(tree_file, logger, labels_dict=make_labels_dict(labels_file))
 
