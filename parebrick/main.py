@@ -22,7 +22,7 @@ from parebrick.clustering.clustering import clustering, split_by_cluster
 
 from parebrick.utils.data.converters import block_coords_to_infercars
 from parebrick.utils.data.parsers import genome_lengths_from_block_coords, parse_infercars_to_df, \
-    get_genomes_contain_blocks_grimm, make_labels_dict, get_block_neighbours
+    get_genomes_contain_blocks_grimm, make_labels_dict, get_block_neighbours, export_df_to_infercars
 from parebrick.utils.data.unique_gene_filters import grimm_filter_unique_gene, filter_dataframe_unique, \
     filter_dataframe_allowed
 from parebrick.utils.data.stats import distance_between_blocks_dict, check_stats_stains, get_mean_coverage
@@ -50,7 +50,8 @@ def initialize():
     global parser, GRIMM_FILENAME, UNIQUE_GRIMM_FILENAME, BLOCKS_COORD_FILENAME, INFERCARS_FILENAME, STATS_FILE, \
         BALANCED_FOLDER, UNBALANCED_FOLDER, CHARACTERS_FOLDER, TREES_FOLDER, BALANCED_COLORS, UNBALANCED_COLORS, \
         clustering_proximity_percentile, clustering_threshold, clustering_j, clustering_j, clustering_b, \
-        CSV_BLOCK_FILENAME, CSV_BLOCK_UNIQUE_FILENAME, CSV_GENOME_LENGTH, have_unique, NEIGHBOURS_FOLDER
+        CSV_BLOCK_FILENAME, CSV_BLOCK_UNIQUE_FILENAME, CSV_GENOME_LENGTH, have_unique, NEIGHBOURS_FOLDER, \
+        INFERCARS_UNIQUE_FILENAME
 
     have_unique = True
 
@@ -97,6 +98,7 @@ def initialize():
 
     BLOCKS_COORD_FILENAME = 'blocks_coords.txt'
     INFERCARS_FILENAME = 'blocks_coords.infercars'
+    INFERCARS_UNIQUE_FILENAME = 'blocks_unique_coords.infercars'
 
     CSV_BLOCK_FILENAME = 'blocks_coords.csv'
     CSV_BLOCK_UNIQUE_FILENAME = 'blocks_unique_coords.csv'
@@ -149,6 +151,7 @@ def parsers_and_stats():
         have_unique = False
         logger.warning('No unique one-copy blocks found. Balanced rearrangements will not be called')
 
+    export_df_to_infercars(unique_blocks_df, preprocessed_data_folder + INFERCARS_UNIQUE_FILENAME)
     blocks_df.to_csv(preprocessed_data_folder + CSV_BLOCK_FILENAME, index=False)
     unique_blocks_df.to_csv(preprocessed_data_folder + CSV_BLOCK_UNIQUE_FILENAME, index=False)
     with open(preprocessed_data_folder + CSV_GENOME_LENGTH, 'w') as f:
