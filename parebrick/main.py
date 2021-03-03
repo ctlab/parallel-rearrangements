@@ -89,7 +89,7 @@ def initialize():
                           help='Use module for visualizing neighbours. Default: True.')
 
     clustering_proximity_percentile = 25
-    clustering_threshold = 0.04
+    clustering_threshold = 0.025
     clustering_j = 0.8
     clustering_b = 0.2
 
