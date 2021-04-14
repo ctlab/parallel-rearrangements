@@ -198,14 +198,14 @@ def balanced_rearrangements_stats():
     logger.info(f'Got characters after breakpoint graph consideration: {len(b_characters)}')
     # sorting for get most interesting characters in the beginning
     # [1][3] for vertex1,vertex2,parallel_rear_score, [1][6] for parallel_breakpoint_score, r[0][0] for vertex1
-    char_stats = sorted(char_stats, key=lambda r: (r[1][3], r[1][6], r[0][0]), reverse=True)
+    char_stats = sorted(char_stats, key=lambda r: (r[1][2], r[1][5], r[0][0]), reverse=True)
     # remove convex characters
     if not keep_consistent:
-        char_stats = list(takewhile(lambda r: not r[1][8], char_stats))
+        char_stats = list(takewhile(lambda r: not r[1][7], char_stats))
         logger.info(f'Left non-convex characters after filtering: {len(char_stats)}')
     else:
         logger.info('Percentage of consistent rearrangements (balanced): '
-                    f'{np.mean([r[1][8] for r in char_stats]) * 100} %')
+                    f'{np.mean([r[1][7] for r in char_stats]) * 100} %')
 
     # unzip
     b_characters = [char for char, stat in char_stats]
