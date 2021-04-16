@@ -1,34 +1,9 @@
-from ete3 import Tree, TreeStyle, TextFace, RectFace, SeqMotifFace
+from ete3 import Tree, TreeStyle, TextFace, RectFace
 
 from collections import defaultdict, Counter
 from itertools import combinations
 
-
-def get_neighbour_motifs(n, ns_colors, offset, inverse=False):
-    block, orient = n[:-1], n[-1]
-    clr = ns_colors[block]
-
-    if (orient == 'h' and not inverse) or (inverse and orient == 't'):
-        return [[offset, offset + 30, "[]", None, 10, clr, clr, f"arial|2|white|+{block}"],
-                [offset + 30, offset + 40, ">", None, 10, clr, clr, None]]
-    else:
-        return [[offset, offset + 10, "<", None, 10, clr, clr, None],
-                [offset + 10, offset + 40, "[]", None, 10, clr, clr, f"arial|2|white|-{block}"]]
-
-
-def generate_neighbour_face(node_ns, ns_colors, block):
-    motifs = [[0, 0, "blank", None, 10, None, None, None]]
-
-    for i, (nbr1, nbr2) in enumerate(sorted(node_ns)):
-        offset = 160 * i
-
-        motifs.extend(get_neighbour_motifs(nbr1, ns_colors, offset))
-        motifs.extend(get_neighbour_motifs(f'{block}h', ns_colors, offset + 50))
-        motifs.extend(get_neighbour_motifs(nbr2, ns_colors, offset + 100, True))
-
-        motifs.append([offset + 140, offset + 160, "blank", None, 10, None, None, None])
-
-    return SeqMotifFace('', motifs=motifs)
+from parebrick.tree.neighbours_utils import generate_neighbour_face, align_neighbours, get_offsets
 
 
 class TreeHolder:
@@ -57,19 +32,23 @@ class TreeHolder:
                     raise KeyError(msg)
                 node.add_face(name_face, column=0)
 
-    def draw_neighbours(self, neighbours, block, colors=['Crimson', 'Teal', 'DarkGreen', 'Purple', 'DarkKhaki',
+    def draw_neighbours(self, neighbours, block, colors=('Crimson', 'Teal', 'DarkGreen', 'Purple', 'DarkKhaki',
                                                          'MediumVioletRed', 'DarkOrange', 'Navy', 'RosyBrown',
-                                                         'DarkGoldenrod', 'Sienna', 'Indigo', 'DarkRed', 'Olive', 'Black']):
-        posible_ns = sorted(list(set(n[:-1] for nss in neighbours.values() for ns in nss for n in ns)))
+                                                         'DarkGoldenrod', 'Sienna', 'Indigo', 'DarkRed', 'Olive',
+                                                         'Black')):
+        posible_ns = sorted(list(set(n[:-1] for nss in neighbours.values() for ns in nss for n in ns[:2])))
 
         ns_colors = {posible_ns[i]: colors[i % len(colors)] for i in range(len(posible_ns))}
         ns_colors[str(block)] = 'grey'
 
         # if block != 2: return
+        all_genomes = [node.name for node in self.tree.traverse()]
+        aligned_neighbours = align_neighbours(neighbours, all_genomes)
+        offsets = get_offsets(aligned_neighbours)
 
         for node in self.tree.traverse():
             if not node.is_leaf(): continue
-            face = generate_neighbour_face(sorted(neighbours[node.name]), ns_colors, block)
+            face = generate_neighbour_face(aligned_neighbours[node.name], ns_colors, block, offsets)
             node.add_face(face, 1, "aligned")
 
     def draw(self, file, colors, color_internal_nodes=True, legend_labels=(), show_branch_support=True,

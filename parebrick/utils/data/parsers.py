@@ -90,11 +90,32 @@ def get_block_neighbours(grimm_file):
             data_line = ls[i + 1]
             bs = GRIMMReader.parse_data_string(data_line)[1]
 
-            for (prev_or, prev_block), (curr_or, curr_block), (next_or, next_block) in zip(bs, bs[1:] + bs[:1], bs[2:] + bs[:2]):
-                neighbours = (prev_block + ('h' if prev_or == '+' else 't'), next_block + ('t' if next_or == '+' else 'h'))
-                if curr_or == '-':
+            n = len(bs)
+            j = 0
+
+            while j < n:
+                tandem_copies = 1
+                prev_or, prev_block = bs[j % n]
+                _, curr_block = bs[(j + 1) % n]
+                next_or, next_block = bs[(j + 2) % n]
+
+                while curr_block == next_block:
+                    j += 1
+                    tandem_copies += 1
+                    next_or, next_block = bs[(j + 2) % n]
+
+                neighbours = (prev_block + ('h' if prev_or == '+' else 't'),
+                              next_block + ('t' if next_or == '+' else 'h'))
+
+                orientations = tuple(bs[(k + 1) % n][0] for k in range(j - tandem_copies + 1, j + 1))
+
+                if orientations[0] == '-':
                     neighbours = (neighbours[1], neighbours[0])
-                block_neighbours[int(curr_block)][genome.name].append(neighbours)
+                    orientations = tuple('+' if or_ == '-' else '+' for or_ in orientations[::-1])
+
+                block_neighbours[int(curr_block)][genome.name].append((*neighbours, tandem_copies, orientations))
+
+                j += 1
 
             i += 2
         else:
