@@ -99,6 +99,10 @@ def get_block_neighbours(grimm_file):
                 _, curr_block = bs[(j + 1) % n]
                 next_or, next_block = bs[(j + 2) % n]
 
+                if curr_block == prev_block:
+                    j += 1
+                    continue
+
                 while curr_block == next_block:
                     j += 1
                     tandem_copies += 1

@@ -35,7 +35,7 @@ class TreeHolder:
     def draw_neighbours(self, neighbours, block, colors=('Crimson', 'Teal', 'DarkGreen', 'Purple', 'DarkKhaki',
                                                          'MediumVioletRed', 'DarkOrange', 'Navy', 'RosyBrown',
                                                          'DarkGoldenrod', 'Sienna', 'Indigo', 'DarkRed', 'Olive',
-                                                         'Black')):
+                                                         'SlateGray', 'SeaGreen', 'IndianRed', 'BurlyWood')):
         posible_ns = sorted(list(set(n[:-1] for nss in neighbours.values() for ns in nss for n in ns[:2])))
 
         ns_colors = {posible_ns[i]: colors[i % len(colors)] for i in range(len(posible_ns))}

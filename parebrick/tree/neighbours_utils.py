@@ -1,5 +1,6 @@
 from ete3 import SeqMotifFace
 from collections import defaultdict, Counter
+from itertools import chain
 
 import numpy as np
 
@@ -35,6 +36,10 @@ def generate_neighbour_face(node_ns, ns_colors, block, offsets):
         else:
             motifs.append([cur_offset, next_offset, "blank", None, 10, None, None, None])
 
+    for offset in offsets[1:-1]:
+        motifs.append([offset - 10, offset - 10, "[]", None, 10, 'grey', 'grey', None])
+        motifs.append([offset - 10, offset, "blank", None, 10, None, None, None])
+
     return SeqMotifFace('', motifs=motifs)
 
 
@@ -44,8 +49,10 @@ def align_neighbours(neighbours, all_genomes):
     sorted_neighbours_keys = sorted(all_genomes, key=lambda k: len(neighbours[k]), reverse=True)
     max_blocks = len(neighbours[sorted_neighbours_keys[0]])
 
-    neighbours_to_position = defaultdict(Counter)
+    l_neighbour_to_position = defaultdict(Counter)
+    r_neighbour_to_position = defaultdict(Counter)
 
+    align_smart = False
     for genome in sorted_neighbours_keys:
         node_ns = neighbours[genome]
 
@@ -53,14 +60,18 @@ def align_neighbours(neighbours, all_genomes):
 
         n = len(node_ns)
         # setting new indexes to better alignment
-        if n < max_blocks:
+        if align_smart:
             new_node_ns = [()] * max_blocks
             used_nodes = [False for _ in range(n)]
             used_indexes = [False for _ in range(max_blocks)]
 
             for i, node_n in enumerate(node_ns):
-                n1, _n2, _1, _2 = node_n
-                for new_ind, _freq in neighbours_to_position[n1[:-1]].most_common():
+                n1, n2, _1, _2 = node_n
+
+                for new_ind, _freq in sorted(chain(l_neighbour_to_position[n1[:-1]].most_common(),
+                                                   map(lambda v: (v[0], v[1] * 0.9),
+                                                       r_neighbour_to_position[n2[:-1]].most_common())),
+                                             key=lambda v: v[1], reverse=True):
                     if not used_indexes[new_ind]:
                         new_node_ns[new_ind] = node_n
                         used_nodes[i] = True
@@ -81,8 +92,10 @@ def align_neighbours(neighbours, all_genomes):
         for i, node_n in enumerate(node_ns):
             if len(node_n) > 0:
                 (n1, n2, _1, _2) = node_n
-                neighbours_to_position[n1[:-1]][i] += 1
+                l_neighbour_to_position[n1[:-1]][i] += 1
+                r_neighbour_to_position[n2[:-1]][i] += 1
 
+        align_smart = True
         aligned_neighbours[genome] = node_ns
 
     return aligned_neighbours
