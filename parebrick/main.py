@@ -113,7 +113,7 @@ def initialize():
     TREES_FOLDER = 'tree_colorings/'
 
     BALANCED_COLORS = ['White', 'Gainsboro', 'DimGray', 'LightGreen', 'LightBlue', 'NavajoWhite', 'LightPink',
-                       'DarkSeaGreen', 'Purple', 'Navy', 'Olive', 'Teal', 'SaddleBrown', 'SeaGreen', 'DarkCyan',
+                       'DarkSeaGreen', 'Orchid', 'Navy', 'Olive', 'Teal', 'SaddleBrown', 'SeaGreen', 'DarkCyan',
                        'DarkOliveGreen', 'LightCoral']
 
     UNBALANCED_COLORS = ['Gainsboro', 'White'] + BALANCED_COLORS[3:]
