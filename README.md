@@ -69,22 +69,22 @@ And folders `characters`, `tree_colorings` with character in rendered `.pdf` tre
 Example data is available in `example-data` folder.
 
 ### How to run example:
-Clone all repository with data:
+1. Clone all repository with data:
 ```bash
 git clone https://github.com/ctlab/parallel-rearrangements
 ```
 
-Change directory to data folder:
+2. Change directory to data folder:
 ```bash
 cd parallel-rearrangements/example-data/streptococcus_pyogenes/input
 ```
 
-Running tool on example input:
+3. (a) Running tool on example input:
 ```
 PaReBrick -t tree.nwk -b maf2synteny-output -l labels.csv
 ```
 
-Or with minimal required arguments (no labels):
+3. (b) Or with minimal required arguments (no labels):
 ```
 PaReBrick -t tree.nwk -b maf2synteny-output
 ```
