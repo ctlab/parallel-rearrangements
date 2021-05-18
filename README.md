@@ -1,30 +1,21 @@
-# PaReBrick (Parallel Rearrangements and Breakpoints identification toolkit)
+# PaReBrick: PArallel REarrangements and BReakpoints identification toolkit
 
 ---
-## Project goals
-Bacterial genomes are remarkably plastic on the evolutionary time scale, and genomic rearrangements such as inversions, deletions, insertions, and duplications independently occur in the genomes of different strains, which may serve a mechanism of the adaptation to changing environmental conditions. 
-Identification of these events requires laborious manual inspection and verification of the phyletic pattern consistency. 
-Thus, the main goal of this project is identification and description of parallel rearrangements occurring in bacterial genomes.
+## Motivation
+High plasticity of bacterial genomes is provided by numerous mechanisms including horizontal gene transfer and recombination via numerous flanking repeats. 
+Genome rearrangements such as inversions, deletions, insertions, and duplications may independently occur in different strains, providing parallel adaptation. 
+Specifically, such rearrangements might be responsible for multi-virulence, antibiotic resistance, and antigenic variation. 
+However, identification of such events requires laborious manual inspection and verification of phyletic pattern consistency.
 
-More strictly, our goal is to find characters which are non-convex on a phylogenetic tree, 
-or in other words characters with homoplasy.
-Homoplasy is when a character state has been gained independently in separate lineages over the course of evolution.
-You can see an example of convex and non-convex characters below:
+## Methods and Results
 
-Non-convex character <br> (character with homoplasy) |  Convex character <br> (homoplasy-free character)
-:-------------------------:|:-------------------------:
-![](figs/example-non-convex.svg)  |  ![](figs/example-convex.svg)
+![Pipeline of tool](figs/pipeline.svg)
 
-## Methods
-This method takes synteny blocks and phylogenetic tree for some strains as input and 
-Method consist of two main parts:
-1. Constructing characters and them states (~colors of leaves) with synteny blocks:
-    * Balanced rearrangements (focused in inversions) — search pattern in multiple breakpoint graph;
-    * Unbalanced rearrangements — considered as copy number variation.
-2. Checking convexity of constructed characters on a phylogenetic tree. 
-Also counting "measure" of non-convexity for all non-convex characters and sort by its value.
+We present **tool `PaReBrick`** — implementation of an algorithmic solution for the identification of parallel rearrangements in bacterial population.
+We define the term "parallel rearrangements" as events that occur independently in phylogenetically distant bacterial strains and present a formalization of the problem of parallel rearrangements calling.
 
-For output size reduction and detection of phyletic patterns of blocks in unbalanced rearrangements case, character clustering is performed.
+The tool takes synteny blocks and a phylogenetic tree as input and outputs rearrangement events. 
+The tool tests each rearrangement for consistency with a tree, and sorts the events by their parallelism score and provides diagrams of the neighbors for each block of interest, allowing the detection of horizontally transferred blocks or their extra copies and the inversions in which copied blocks are involved.
 
 ## Installation 
 
@@ -66,19 +57,18 @@ Default is `./parebrick_output`
 ### Output
 Output consist of tree folders.
 1. `preprocessed_data` — 
-here you can find `blocks_coords.infercars` for better blocks representation and region annotation.
-And `genomes_permutations_unique.txt` file used for calling balanced characters.
-As well as same data but in `.csv` format for more convenient use.
+here you can find both all and common synteny blocks in both `infercars`, `GRIMM` and `csv` formats.
+As well as same `genomes_lengths.csv` file with lengths of provided genomes.
 2. `balanced_rearrangements_output` — this folder contains `stats.csv` file with all non-convex characters statistics of balanced rearrangements. 
-And folders `characters`, `trees` with character representation in rendered `.pdf` tree and `.csv` formats.
+And folders `characters`, `tree_colorings` with character representation in rendered `.pdf` tree and `.csv` formats.
 3. `unbalanced_rearrangements_output` — this folder contains `stats.csv` file with all non-convex characters statistics of unbalanced rearrangements. 
-And folders `characters`, `trees` with character in rendered `.pdf` tree and `.csv` formats in subfolders according to their clustering representation.
+And folders `characters`, `tree_colorings` with character in rendered `.pdf` tree and `.csv` formats in subfolders according to their clustering representation.
 
 
 ## Example run and data
 Example data is available in `example-data` folder.
 
-### How to run:
+### How to run example:
 Clone all repository with data:
 ```bash
 git clone https://github.com/ctlab/parallel-rearrangements
