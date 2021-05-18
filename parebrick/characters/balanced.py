@@ -76,7 +76,7 @@ def get_characters(grimm_file, genomes, logger):
             genome_colors, neighbour_edges = get_character_by_edge(component_bg, edge, genomes, neighbour_index)
             if white_proportion(genome_colors.values()) < 0.5: continue
 
-            labels = ['edge exists', 'parallel edge doesn\'t exist', 'some block is not presented'] + \
+            labels = ['adjacency exists', 'complex break of adjacency', 'some block is not presented'] + \
                      [f'inversion between {v1}-{v2} and {v1n}-{v2n}' for (v1n, v2n) in neighbour_edges]
 
             characters.append((v1, v2, genome_colors, labels))
