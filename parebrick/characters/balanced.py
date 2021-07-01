@@ -9,6 +9,8 @@ import numpy as np
 import os
 import csv
 
+from collections import Counter
+
 get_colors_by_edge = lambda e: e.multicolor.multicolors
 
 def white_proportion(colors):
@@ -19,7 +21,7 @@ def get_character_by_edge(bg, edge, genomes, neighbour_index):
         return neighbour_index[(v, genome)]
 
     def get_genome_character_state_by_edge(genome):
-        if cnt[BGGenome(genome)] == 1:
+        if cnt[genome] == 1:
             return 0
         else:
             v1, v2 = edge.vertex1.name, edge.vertex2.name
@@ -38,7 +40,9 @@ def get_character_by_edge(bg, edge, genomes, neighbour_index):
             else:
                 return 1
 
-    cnt = get_colors_by_edge(edge)
+    cnt = Counter([genome.name.rsplit('.', 1)[0]
+                   for genome, count in get_colors_by_edge(edge).items()
+                   for _ in range(count)])
     possible_edges = []
     return {genome: get_genome_character_state_by_edge(genome) for genome in genomes}, possible_edges
 
@@ -48,11 +52,12 @@ def construct_vertex_genome_index(bg):
         for edge in bg.get_edges_by_vertex(v):
             colors = get_colors_by_edge(edge)
             for color in colors:
-                neighbour_index[(str(v), color.name)] = edge.vertex2
+                strain, _ = color.name.rsplit('.', 1)
+                neighbour_index[(str(v), strain)] = edge.vertex2
 
     return neighbour_index
 
-def get_characters(grimm_file, genomes, logger):
+def get_characters_balanced(grimm_file, genomes, logger):
     bg = GRIMMReader.get_breakpoint_graph(open(grimm_file))
     logger.info('Breakpoint graph parsed')
 

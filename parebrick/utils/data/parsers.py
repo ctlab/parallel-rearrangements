@@ -59,6 +59,15 @@ def genome_lengths_from_block_coords(in_file):
     df_head = pd.read_csv(StringIO(''.join(head_lines)), sep='\t')
     return {row['Description']: row['Size'] for index, row in df_head.iterrows()}
 
+def genome_genome_lengths_from_chromosomes_lengths(chr_lengths):
+    lengths = defaultdict(int)
+
+    for chr, len in chr_lengths.items():
+        strain, _ = chr.rsplit('.', 1)
+        lengths[strain] += len
+
+    return lengths
+
 
 def get_genomes_contain_blocks_grimm(grimm_file):
     genomes, blocks = set(), set()
@@ -68,7 +77,7 @@ def get_genomes_contain_blocks_grimm(grimm_file):
     block_genome_count = defaultdict(Counter)
 
     for i in range(0, len(ls), 2):
-        name = GRIMMReader.parse_genome_declaration_string(ls[i]).name
+        name = GRIMMReader.parse_genome_declaration_string(ls[i]).name.rsplit('.', 1)[0]
         data = GRIMMReader.parse_data_string(ls[i + 1])[1]
         genomes.add(name)
         for _, block in data:
@@ -86,7 +95,7 @@ def get_block_neighbours(grimm_file):
     while i < len(ls):
         l = ls[i]
         if GRIMMReader.is_genome_declaration_string(l):
-            genome = GRIMMReader.parse_genome_declaration_string(l)
+            strain, chr = GRIMMReader.parse_genome_declaration_string(l).name.rsplit('.', 1)
             data_line = ls[i + 1]
             bs = GRIMMReader.parse_data_string(data_line)[1]
 
@@ -117,7 +126,7 @@ def get_block_neighbours(grimm_file):
                     neighbours = (neighbours[1], neighbours[0])
                     orientations = tuple('+' if or_ == '-' else '+' for or_ in orientations[::-1])
 
-                block_neighbours[int(curr_block)][genome.name].append((*neighbours, tandem_copies, orientations))
+                block_neighbours[int(curr_block)][strain].append((*neighbours, tandem_copies, orientations))
 
                 j += 1
 
