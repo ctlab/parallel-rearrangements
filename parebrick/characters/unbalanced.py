@@ -12,16 +12,20 @@ def get_characters_stats_unbalanced(blocks, characters, tree_holder):
     for block, genome_colors in zip(blocks, characters):
         tree_holder.count_innovations_fitch(genome_colors)
 
+        ins_del_dict = tree_holder.insertions_deltitions
+        insetions = sum(len(nodes) for change, nodes in ins_del_dict.items() if change > 0)
+        delitions = sum(len(nodes) for change, nodes in ins_del_dict.items() if change < 0)
+
         score_rear, count_rear, count_all_rear = tree_holder.count_parallel_rearrangements(skip_grey=False)
         mean_copies = mean(genome_colors.values())
-        ans.append([block, score_rear, count_rear, count_all_rear, mean_copies, count_all_rear <= 1])
+        ans.append([block, score_rear, count_rear, count_all_rear, mean_copies, count_all_rear <= 1, insetions, delitions])
 
     return ans
 
 
 def write_stats_csv_unbalanced(stats, cls, stats_file):
     rows = [['block', 'cluster', 'parallel_rear_score', 'number_of_inconsistent_colors', 'number_of_parallel_events',
-             'mean_copies', 'tree_consistent']] + \
+             'mean_copies', 'tree_consistent', 'insertions_count', 'deletions_count']] + \
            [stat[0:1] + [cl] + stat[1:] for stat, cl in zip(stats, cls)]
     with open(stats_file, 'w') as f:
         wtr = csv.writer(f)
