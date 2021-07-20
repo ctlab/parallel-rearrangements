@@ -93,7 +93,7 @@ def initialize():
                                'Rest of weight will be used in distance between blocks.'
                                'E.g. if set to 0.8 (default) distance between blocks coefficient will be set to 0.2.')
 
-    optional.add_argument('--clustering_threshold', '-t', type=float, metavar='[0-1]', default=0.025,
+    optional.add_argument('--clustering_threshold', '-c', type=float, metavar='[0-1]', default=0.025,
                           help='Threshold for algorithm of clustering, default is 0.025.'
                                'Can be increased for getting larger clusters or decreased for getting smaller and more grouped clusters.')
 
