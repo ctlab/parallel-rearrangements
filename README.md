@@ -97,5 +97,3 @@ PaReBrick -t tree.nwk -b maf2synteny-output
 If you use `PaReBrick` in your research, please cite:
 
 Alexey Zabelkin, Yulia Yakovleva, Olga Bochkareva, Nikita Alexeev, PaReBrick: PArallel REarrangements and BReaks identification toolkit, Bioinformatics, 2021;, btab691, https://doi.org/10.1093/bioinformatics/btab691 
-
-[![DOI:10.1093/bioinformatics/btab691](https://zenodo.org/badge/DOI/10.1093/bioinformatics/btab691)](https://doi.org/10.1093/bioinformatics/btab691)
