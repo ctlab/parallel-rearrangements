@@ -3,8 +3,8 @@
 ---
 ## Motivation
 High plasticity of bacterial genomes is provided by numerous mechanisms including horizontal gene transfer and recombination via numerous flanking repeats. 
-Genome rearrangements such as inversions, deletions, insertions, and duplications may independently occur in different strains, providing parallel adaptation. 
-Specifically, such rearrangements might be responsible for multi-virulence, antibiotic resistance, and antigenic variation. 
+Genome rearrangements such as inversions, deletions, insertions, and duplications may independently occur in different strains, providing parallel adaptation or phenotypic diversity. 
+Specifically, such rearrangements might be responsible for virulence, antibiotic resistance, and antigenic variation. 
 However, identification of such events requires laborious manual inspection and verification of phyletic pattern consistency.
 
 ## Methods and Results
@@ -14,8 +14,11 @@ However, identification of such events requires laborious manual inspection and 
 We present **tool `PaReBrick`** — implementation of an algorithmic solution for the identification of parallel rearrangements in bacterial population.
 We define the term "parallel rearrangements" as events that occur independently in phylogenetically distant bacterial strains and present a formalization of the problem of parallel rearrangements calling.
 
-The tool takes synteny blocks and a phylogenetic tree as input and outputs rearrangement events. 
-The tool tests each rearrangement for consistency with a tree, and sorts the events by their parallelism score and provides diagrams of the neighbors for each block of interest, allowing the detection of horizontally transferred blocks or their extra copies and the inversions in which copied blocks are involved.
+The tool takes a collection of strains represented as a sequence of oriented synteny blocks and a phylogenetic tree as input data. 
+It identifies rearrangements, tests them for consistency with a tree, and sorts the events by their parallelism score. 
+The tool provides diagrams of the neighbors for each block of interest, allowing the detection of horizontally transferred blocks or their extra copies and the inversions in which copied blocks are involved.
+
+We [demonstrated](https://doi.org/10.1093/bioinformatics/btab691) PaReBrick’s efficiency and accuracy and showed its potential to detect genome rearrangements responsible for pathogenicity and adaptation in bacterial genomes.
 
 ## Installation 
 
@@ -88,3 +91,11 @@ PaReBrick -t tree.nwk -b maf2synteny-output -l labels.csv
 ```
 PaReBrick -t tree.nwk -b maf2synteny-output
 ```
+
+## Citation
+
+If you use `PaReBrick` in your research, please cite:
+
+Alexey Zabelkin, Yulia Yakovleva, Olga Bochkareva, Nikita Alexeev, PaReBrick: PArallel REarrangements and BReaks identification toolkit, Bioinformatics, 2021;, btab691, https://doi.org/10.1093/bioinformatics/btab691 
+
+[![DOI:10.1093/nargab/lqaa106](https://zenodo.org/badge/DOI/10.1093/nargab/lqaa106.svg)](https://academic.oup.com/nargab/article/3/1/lqaa106/6090162)
