@@ -7,9 +7,14 @@ from parebrick.tree.neighbours_utils import generate_neighbour_face, align_neigh
 
 
 class TreeHolder:
-    def __init__(self, tree, logger, scale=None, labels_dict=None, node_colors=defaultdict(lambda: 'black')):
+    def __init__(self, tree, logger, scale=None, labels_dict=None, node_colors=defaultdict(lambda: 'black'),
+                 reroot=True):
         self.tree = Tree(tree)
         self.scale = scale
+
+        if reroot:
+            r = self.tree.get_midpoint_outgroup()
+            self.tree.set_outgroup(r)
 
         for node in self.tree.traverse():
             if len(node.children) == 3:

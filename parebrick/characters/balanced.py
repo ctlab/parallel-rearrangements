@@ -32,7 +32,19 @@ def get_character_by_edge(bg, edge, genomes, neighbour_index):
                 v2_neighbour = get_neighbour_with_genome(v2, genome)
             except KeyError:
                 return 2
-            if bg.get_edge_by_two_vertices(v1_neighbour, v2_neighbour):
+
+            neighbour_edge = bg.get_edge_by_two_vertices(v1_neighbour, v2_neighbour)
+            if neighbour_edge:
+                neighbour_edge_genomes = get_colors_by_edge(neighbour_edge)
+                neighbour_edge_genomes_count = sum(neighbour_edge_genomes.values())
+
+                neighbour_edge_genomes_names = set(g for g in genomes if neighbour_edge_genomes[BGGenome(g)])
+                white_genomes_at_neighbour_edge = len(neighbour_edge_genomes_names & white_genomes)
+
+                # if white_genomes_at_neighbour_edge < 1:
+                if neighbour_edge_genomes_count <= len(genomes) // 2:
+                    return 1
+
                 pair = (v1_neighbour, v2_neighbour)
                 if pair not in possible_edges:
                     possible_edges.append(pair)
@@ -44,6 +56,7 @@ def get_character_by_edge(bg, edge, genomes, neighbour_index):
                    for genome, count in get_colors_by_edge(edge).items()
                    for _ in range(count)])
     possible_edges = []
+    white_genomes = set(g for g in genomes if BGGenome(g))
     return {genome: get_genome_character_state_by_edge(genome) for genome in genomes}, possible_edges
 
 def construct_vertex_genome_index(bg):
