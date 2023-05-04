@@ -183,7 +183,7 @@ def parsers_and_stats():
     with open(preprocessed_data_folder + CSV_GENOME_LENGTH, 'w') as f:
         w = csv.writer(f)
         w.writerow(['Genome', 'Length'])
-        w.writerows(chr_lengths.items())
+        w.writerows(genome_lengths.items())
 
     logger.info(f'Blocks count: {len(blocks_df["block"].unique())}')
     logger.info(f'Unique one-copy blocks count: {len(unique_blocks_df["block"].unique())}')

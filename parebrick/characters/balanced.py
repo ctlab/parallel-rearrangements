@@ -41,8 +41,8 @@ def get_character_by_edge(bg, edge, genomes, neighbour_index):
                 neighbour_edge_genomes_names = set(g for g in genomes if neighbour_edge_genomes[BGGenome(g)])
                 white_genomes_at_neighbour_edge = len(neighbour_edge_genomes_names & white_genomes)
 
-                # if white_genomes_at_neighbour_edge < 1:
-                if neighbour_edge_genomes_count <= len(genomes) // 2:
+                if white_genomes_at_neighbour_edge < 1:
+                # if neighbour_edge_genomes_count <= len(genomes) // 2:
                     return 1
 
                 pair = (v1_neighbour, v2_neighbour)
@@ -52,7 +52,7 @@ def get_character_by_edge(bg, edge, genomes, neighbour_index):
             else:
                 return 1
 
-    cnt = Counter([genome.name.rsplit('.', 1)[0]
+    cnt = Counter([genome.name
                    for genome, count in get_colors_by_edge(edge).items()
                    for _ in range(count)])
     possible_edges = []
@@ -65,8 +65,7 @@ def construct_vertex_genome_index(bg):
         for edge in bg.get_edges_by_vertex(v):
             colors = get_colors_by_edge(edge)
             for color in colors:
-                strain, _ = color.name.rsplit('.', 1)
-                neighbour_index[(str(v), strain)] = edge.vertex2
+                neighbour_index[(str(v), color.name)] = edge.vertex2
 
     return neighbour_index
 
@@ -87,12 +86,12 @@ def get_characters_balanced(grimm_file, genomes, logger):
 
         neighbour_index = construct_vertex_genome_index(component_bg)
 
-        for i_edge, edge in enumerate(component_bg.edges()):
+        for edge in component_bg.edges():
             v1, v2 = edge.vertex1.name, edge.vertex2.name
             if v1 > v2: v1, v2 = v2, v1
 
             genome_colors, neighbour_edges = get_character_by_edge(component_bg, edge, genomes, neighbour_index)
-            if white_proportion(genome_colors.values()) < 0.5: continue
+            if white_proportion(genome_colors.values()) < 0.33: continue
 
             labels = ['adjacency exists', 'complex break of adjacency', 'some block is not presented'] + \
                      [f'inversion with {v1n}-{v2n}' for (v1n, v2n) in neighbour_edges]
@@ -115,7 +114,7 @@ def get_characters_stats_balanced(characters, tree_holder, distance_between_bloc
         white_strains = [strain for strain, color in genome_colors.items() if color == 0]
         mean_break_length = np.mean([distance_between_blocks[(b1, b2)][strain] for strain in white_strains])
 
-        ans.append([f'{v1}–{v2}', int(mean_break_length), score_rear, count_rear, count_all_rear, score_break, count_break,
+        ans.append([f'{v1}-{v2}', int(mean_break_length), score_rear, count_rear, count_all_rear, score_break, count_break,
                     count_break <= 1])
 
     return ans
