@@ -77,7 +77,7 @@ def get_genomes_contain_blocks_grimm(grimm_file):
     block_genome_count = defaultdict(Counter)
 
     for i in range(0, len(ls), 2):
-        name = GRIMMReader.parse_genome_declaration_string(ls[i]).name.rsplit('.', 1)[0]
+        name = GRIMMReader.parse_genome_declaration_string(ls[i]).name
         data = GRIMMReader.parse_data_string(ls[i + 1])[1]
         genomes.add(name)
         for _, block in data:
