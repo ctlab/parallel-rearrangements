@@ -29,7 +29,7 @@ def grimm_filter_unique_gene(in_file, out_file, block_rate):
     while i < len(lines):
         line = lines[i]
         if GRIMMReader.is_genome_declaration_string(line):
-            strain, chr = GRIMMReader.parse_genome_declaration_string(line).name.rsplit('.', 1)
+            strain = GRIMMReader.parse_genome_declaration_string(line).name
             strains.add(strain)
 
             data_line = lines[i + 1]
