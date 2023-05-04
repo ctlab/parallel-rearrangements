@@ -8,7 +8,7 @@ from parebrick.tree.neighbours_utils import generate_neighbour_face, align_neigh
 
 class TreeHolder:
     def __init__(self, tree, logger, scale=None, labels_dict=None, node_colors=defaultdict(lambda: 'black'),
-                 reroot=True):
+                 reroot=True, hz_line_width=1, vt_line_width=1):
         self.tree = Tree(tree)
         self.scale = scale
 
@@ -26,6 +26,8 @@ class TreeHolder:
         for node in self.tree.traverse():
             # Hide node circles
             node.img_style['size'] = 0
+            node.img_style['hz_line_width'] = hz_line_width
+            node.img_style['vt_line_width'] = vt_line_width
 
             if node.is_leaf():
                 try:
