@@ -95,7 +95,7 @@ def get_block_neighbours(grimm_file):
     while i < len(ls):
         l = ls[i]
         if GRIMMReader.is_genome_declaration_string(l):
-            strain, chr = GRIMMReader.parse_genome_declaration_string(l).name.rsplit('.', 1)
+            strain = GRIMMReader.parse_genome_declaration_string(l).name
             data_line = ls[i + 1]
             bs = GRIMMReader.parse_data_string(data_line)[1]
 
