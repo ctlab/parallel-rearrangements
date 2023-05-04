@@ -7,9 +7,14 @@ from parebrick.tree.neighbours_utils import generate_neighbour_face, align_neigh
 
 
 class TreeHolder:
-    def __init__(self, tree, logger, scale=None, labels_dict=None, node_colors=defaultdict(lambda: 'black')):
+    def __init__(self, tree, logger, scale=None, labels_dict=None, node_colors=defaultdict(lambda: 'black'),
+                 reroot=True, hz_line_width=1, vt_line_width=1):
         self.tree = Tree(tree)
         self.scale = scale
+
+        if reroot:
+            r = self.tree.get_midpoint_outgroup()
+            self.tree.set_outgroup(r)
 
         for node in self.tree.traverse():
             if len(node.children) == 3:
@@ -21,6 +26,8 @@ class TreeHolder:
         for node in self.tree.traverse():
             # Hide node circles
             node.img_style['size'] = 0
+            node.img_style['hz_line_width'] = hz_line_width
+            node.img_style['vt_line_width'] = vt_line_width
 
             if node.is_leaf():
                 try:
@@ -124,13 +131,15 @@ class TreeHolder:
             for child in v.children:
                 down_to_leaves(child, v.color)
 
-        def count_innovations(v, innovations):
+        def count_innovations(v, innovations, insertions_deltitions):
             for child in v.children:
                 if v.color != child.color and not (not count_second_color and (v.color == 2) or (child.color == 2)):
                     innovations[child.color].append(child)
-                count_innovations(child, innovations)
+                    insertions_deltitions[child.color - v.color].append(child)
+                count_innovations(child, innovations, self.insertions_deltitions)
 
         color_counter = Counter(leaf_colors.values())
+        # print(color_counter)
 
         # get colorsets for internal nodes
         root = self.tree.get_tree_root()
@@ -142,7 +151,8 @@ class TreeHolder:
 
         # get inconsistent colors
         self.innovations = defaultdict(list)
-        count_innovations(root, self.innovations)
+        self.insertions_deltitions = defaultdict(list)
+        count_innovations(root, self.innovations, self.insertions_deltitions)
 
     def count_parallel_rearrangements(self, skip_grey):
         score, count, count_all = 0, 0, 0

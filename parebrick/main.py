@@ -12,17 +12,20 @@ from time import time
 from itertools import takewhile
 from operator import itemgetter
 
-from parebrick.characters.balanced import get_characters, write_characters_csv_balanced, get_characters_stats_balanced, \
+from parebrick.characters.balanced import get_characters_balanced, write_characters_csv_balanced, get_characters_stats_balanced, \
     write_trees_balanced, write_stats_csv_balanced
 from parebrick.characters.unbalanced import get_characters_stats_unbalanced, write_stats_csv_unbalanced, \
     write_characters_csv_unbalanced, call_unique_characters, write_trees_unbalanced
 from parebrick.characters.neighbours import write_trees_neightbours
+from parebrick.characters.which_chromosome import get_characters_which_chr, get_characters_stats_which_chr, \
+    write_stats_csv_which_chr, write_characters_csv_which_chr, write_trees_which_chr
 
 from parebrick.clustering.clustering import clustering, split_by_cluster
 
 from parebrick.utils.data.converters import block_coords_to_infercars
 from parebrick.utils.data.parsers import genome_lengths_from_block_coords, parse_infercars_to_df, \
-    get_genomes_contain_blocks_grimm, make_labels_dict, get_block_neighbours, export_df_to_infercars
+    get_genomes_contain_blocks_grimm, make_labels_dict, get_block_neighbours, export_df_to_infercars, \
+    genome_genome_lengths_from_chromosomes_lengths
 from parebrick.utils.data.unique_gene_filters import grimm_filter_unique_gene, filter_dataframe_unique, \
     filter_dataframe_allowed
 from parebrick.utils.data.stats import distance_between_blocks_dict, check_stats_stains, get_mean_coverage
@@ -61,7 +64,7 @@ def initialize():
         BALANCED_FOLDER, UNBALANCED_FOLDER, CHARACTERS_FOLDER, TREES_FOLDER, BALANCED_COLORS, UNBALANCED_COLORS, \
         clustering_proximity_percentile, clustering_threshold, clustering_j, clustering_j, clustering_b, \
         CSV_BLOCK_FILENAME, CSV_BLOCK_UNIQUE_FILENAME, CSV_GENOME_LENGTH, have_unique, NEIGHBOURS_FOLDER, \
-        INFERCARS_UNIQUE_FILENAME
+        INFERCARS_UNIQUE_FILENAME, WHICH_CHR_FOLDER
 
     have_unique = True
 
@@ -98,6 +101,10 @@ def initialize():
     optional.add_argument('--visualize_neighbours', '-vn', type=str2bool, default=True,
                           help='Use module for visualizing neighbours. Default: True.')
 
+
+    optional.add_argument('--which_chr', '-chr', type=str2bool, default=False,
+                          help='Use information about in which chromosome block is located. Default: False.')
+
     optional.add_argument('--clustering_tree_patterns_coef', '-j', type=restricted_float, metavar='[0-1]', default=0.8,
                           help='Coefficient (0-1) of weight of tree patterns similarity in clustering in unbalanced (copy number variation) module.'
                                'Rest of weight will be used in distance between blocks.'
@@ -124,6 +131,7 @@ def initialize():
     BALANCED_FOLDER = 'balanced_rearrangements_output/'
     UNBALANCED_FOLDER = 'un' + BALANCED_FOLDER
     NEIGHBOURS_FOLDER = 'neighbours_output/'
+    WHICH_CHR_FOLDER = 'which_chromosome_output/'
 
     CHARACTERS_FOLDER = 'characters/'
     TREES_FOLDER = 'tree_colorings/'
@@ -154,10 +162,12 @@ def preprocess_data():
 # is checked, if necessary, the missing strains are discarded.
 @decorate("Parsers and check strains", logger)
 def parsers_and_stats():
-    global genome_lengths, blocks_df, tree_holder, genomes, blocks, block_genome_count, have_unique, unique_blocks, \
+    global chr_lengths, blocks_df, tree_holder, genomes, blocks, block_genome_count, have_unique, unique_blocks, \
         neighbours
 
-    genome_lengths = genome_lengths_from_block_coords(blocks_folder + BLOCKS_COORD_FILENAME)
+    chr_lengths = genome_lengths_from_block_coords(blocks_folder + BLOCKS_COORD_FILENAME)
+    genome_lengths = genome_genome_lengths_from_chromosomes_lengths(chr_lengths)
+
     blocks_df = parse_infercars_to_df(preprocessed_data_folder + INFERCARS_FILENAME)
     unique_blocks_df = filter_dataframe_unique(blocks_df)
     filted_blocks_df = filter_dataframe_allowed(blocks_df, unique_blocks)
@@ -173,7 +183,7 @@ def parsers_and_stats():
     with open(preprocessed_data_folder + CSV_GENOME_LENGTH, 'w') as f:
         w = csv.writer(f)
         w.writerow(['Genome', 'Length'])
-        w.writerows(genome_lengths.items())
+        w.writerows(chr_lengths.items())
 
     logger.info(f'Blocks count: {len(blocks_df["block"].unique())}')
     logger.info(f'Unique one-copy blocks count: {len(unique_blocks_df["block"].unique())}')
@@ -196,7 +206,7 @@ def parsers_and_stats():
 @decorate("Balanced rearrangements characters", logger)
 def balanced_rearrangements_characters():
     global b_characters
-    b_characters = get_characters(preprocessed_data_folder + UNIQUE_GRIMM_FILENAME, genomes, logger)
+    b_characters = get_characters_balanced(preprocessed_data_folder + UNIQUE_GRIMM_FILENAME, genomes, logger)
 
 
 # This module implements balanced rearrangements characters statistics calculation
@@ -207,7 +217,7 @@ def balanced_rearrangements_stats():
     global b_characters, b_stats, keep_consistent
 
     logger.info('Counting distances between unique one-copy blocks, may take a while')
-    distance_between_uniq_blocks = distance_between_blocks_dict(blocks_df, genome_lengths, unique_blocks)
+    distance_between_uniq_blocks = distance_between_blocks_dict(blocks_df, chr_lengths, unique_blocks)
     b_stats = get_characters_stats_balanced(b_characters, tree_holder, distance_between_uniq_blocks)
     char_stats = zip(b_characters, b_stats)
 
@@ -287,9 +297,9 @@ def unbalanced_rearrangements_stats_and_clustering():
         return
     logger.info('Counting distances between non-convex character blocks, may take a while')
     if len(ub_stats) > 1:
-        distance_between_blocks = distance_between_blocks_dict(blocks_df, genome_lengths,
+        distance_between_blocks = distance_between_blocks_dict(blocks_df, chr_lengths,
                                                                set(map(itemgetter(0), ub_stats)))
-        ub_cls = clustering(ub_characters, ub_stats, distance_between_blocks, max(genome_lengths.values()),
+        ub_cls = clustering(ub_characters, ub_stats, distance_between_blocks, max(chr_lengths.values()),
                             clustering_threshold, clustering_j, clustering_b, clustering_proximity_percentile, logger)
     else:
         ub_cls = np.array([0])
@@ -331,6 +341,50 @@ def neighbours_output():
                             tree_holder, UNBALANCED_COLORS)
 
 
+@decorate("Which chromosome characters", logger)
+def which_chromosome_characters():
+    global chr_characters
+    chr_characters = get_characters_which_chr(blocks_df)
+
+
+@decorate("Which chromosome stats and clustering", logger)
+def which_chromosome_stats_and_clustering():
+    global chr_cls, chr_characters, chr_stats
+    chr_stats = get_characters_stats_which_chr(chr_characters, tree_holder)
+
+    char_stats = zip(chr_characters, chr_stats)
+    logger.info(f'Got characters after which chromosome consideration: {len(blocks)}')
+    # sorting for get most interesting characters in the beginning
+    char_stats = sorted(char_stats, key=lambda r: (r[1][4], r[1][3]), reverse=True)
+    # remove convex characters
+    if not keep_consistent:
+        char_stats = list(takewhile(lambda r: not r[1][7], char_stats))
+        logger.info(f'Left non-convex characters after filtering: {len(char_stats)}')
+    else:
+        logger.info('Percentage of consistent rearrangements (unbalanced): '
+                    f'{np.mean([r[1][7] for r in char_stats]) * 100} %')
+
+    # unzip
+    chr_characters = [char for char, stat in char_stats]
+    chr_stats = [stat for char, stat in char_stats]
+
+
+@decorate('Which chromosome output', logger)
+def which_chromosome_output():
+    chr_folder = output_folder + WHICH_CHR_FOLDER
+    os.makedirs(chr_folder, exist_ok=True)
+
+    stats_file = chr_folder + STATS_FILE
+    write_stats_csv_which_chr(chr_stats, stats_file)
+
+    characters_folder = chr_folder + CHARACTERS_FOLDER
+
+    write_characters_csv_which_chr(chr_characters, characters_folder)
+
+    trees_folder = chr_folder + TREES_FOLDER
+    write_trees_which_chr(chr_characters, trees_folder, show_branch_support, tree_holder, UNBALANCED_COLORS)
+
+
 def main():
     def logger_initialize():
         file_handler = logging.FileHandler(filename=output_folder + 'run.log')
@@ -350,10 +404,11 @@ def main():
     start_time = time()
     d = vars(parser.parse_args())
     blocks_folder, output_folder, tree_file, labels_file, show_branch_support, keep_consistent, balanced_block_rate, \
-    visualize_neighbours, clustering_j, clustering_threshold = \
-        d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support'], d['keep_non_parallel'], \
-        d['filter_for_balanced'], d['visualize_neighbours'], d['clustering_tree_patterns_coef'], \
-        d['clustering_threshold']
+    visualize_neighbours, clustering_j, clustering_threshold, which_chr_flag = \
+         = d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support'], d['keep_non_parallel'], \
+           d['filter_for_balanced'], d['visualize_neighbours'], d['clustering_tree_patterns_coef'], \
+        d['clustering_threshold'], d['which_chr']
+
     clustering_b = 1 - clustering_j
 
     # folders
@@ -378,6 +433,11 @@ def main():
     unbalanced_rearrangements_characters()
     unbalanced_rearrangements_stats_and_clustering()
     if len(ub_stats) != 0: unbalanced_rearrangements_output()
+
+    if which_chr_flag:
+        which_chromosome_characters()
+        which_chromosome_stats_and_clustering()
+        which_chromosome_output()
 
     if visualize_neighbours:
         neighbours_output()

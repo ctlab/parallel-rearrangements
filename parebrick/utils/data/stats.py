@@ -22,33 +22,33 @@ def distance_between_blocks_dict(df_blocks, genome_length, allowed_blocks=None):
     df['real_beg'] = df.apply(lambda row: row.chr_beg if row.orientation == '+' else row.chr_end, axis=1)
     df['real_end'] = df.apply(lambda row: row.chr_beg if row.orientation == '-' else row.chr_end, axis=1)
 
-    for i, (strain, df_strain) in enumerate(df.groupby('species')):
-        # print(strain, i, 'of', len(df['species'].unique()))
-        l = genome_length[strain]
+    for strain, df_strain in df.groupby('species'):
+        for chr, df_strain_chr in df_strain.groupby('chr'):
+            l = genome_length[strain + '.' + chr]
 
-        xs = df_strain[['block', 'real_beg', 'real_end']].to_numpy()
+            xs = df_strain_chr[['block', 'real_beg', 'real_end']].to_numpy()
 
-        m, n = xs.shape
+            m, n = xs.shape
 
-        combs = np.zeros((m, m, 2 * n), dtype=int)
-        combs[:, :, :n] = xs[:, None, :]
-        combs[:, :, n:] = xs
-        combs.shape = (m * m, -1)
+            combs = np.zeros((m, m, 2 * n), dtype=int)
+            combs[:, :, :n] = xs[:, None, :]
+            combs[:, :, n:] = xs
+            combs.shape = (m * m, -1)
 
-        combs = combs[np.where((combs[:, 3] - combs[:, 0]) > 0), :][0]
+            combs = combs[np.where((combs[:, 3] - combs[:, 0]) > 0), :][0]
 
-        for b1, st1, end1, b2, st2, end2 in combs:
-            if b1 >= b2: continue
-            distances[(b1, b2)][strain] = min(distances[(b1, b2)][strain],
-                                              abs(st1 - st2),
-                                              l - abs(st1 - st2),
-                                              abs(st1 - end2),
-                                              l - abs(st1 - end2),
-                                              abs(end1 - st2),
-                                              l - abs(end1 - st2),
-                                              abs(end1 - end2),
-                                              l - abs(end1 - end2),
-                                              )
+            for b1, st1, end1, b2, st2, end2 in combs:
+                if b1 >= b2: continue
+                distances[(b1, b2)][strain] = min(distances[(b1, b2)][strain],
+                                                  abs(st1 - st2),
+                                                  l - abs(st1 - st2),
+                                                  abs(st1 - end2),
+                                                  l - abs(st1 - end2),
+                                                  abs(end1 - st2),
+                                                  l - abs(end1 - st2),
+                                                  abs(end1 - end2),
+                                                  l - abs(end1 - end2),
+                                                  )
 
     return distances
 
@@ -62,8 +62,8 @@ def check_stats_stains(tree, block_genomes, logger):
 
     if not len(block_genomes & tree_genomes) == len(tree_genomes) == len(block_genomes):
         if len(block_genomes & tree_genomes) == 0:
-            logger.error('Tree genomes: {tree_genomes}')
-            logger.error('Blocks genomes: {block_genomes}')
+            logger.error(f'Tree genomes: {tree_genomes}')
+            logger.error(f'Blocks genomes: {block_genomes}')
             logger.error('Seems like strains in block files and in tree leafs have different ids, intersection is empty.')
             raise ValueError(
                 'Seems like strains in block files and in tree leafs have different ids, intersection is empty.')
