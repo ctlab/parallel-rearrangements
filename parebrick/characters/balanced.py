@@ -95,7 +95,7 @@ def get_characters_balanced(grimm_file, genomes, logger):
             if white_proportion(genome_colors.values()) < 0.5: continue
 
             labels = ['adjacency exists', 'complex break of adjacency', 'some block is not presented'] + \
-                     [f'inversion between {v1}-{v2} and {v1n}-{v2n}' for (v1n, v2n) in neighbour_edges]
+                     [f'inversion with {v1n}-{v2n}' for (v1n, v2n) in neighbour_edges]
 
             characters.append((v1, v2, genome_colors, labels))
 

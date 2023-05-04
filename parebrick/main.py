@@ -47,6 +47,16 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
+def restricted_float(x):
+    try:
+        x = float(x)
+    except ValueError:
+        raise argparse.ArgumentTypeError("%r not a floating-point literal" % (x,))
+
+    if x < 0.0 or x > 1.0:
+        raise argparse.ArgumentTypeError("%r not in range [0.0, 1.0]"%(x,))
+    return x
+
 
 # argument parsing
 def initialize():
@@ -91,13 +101,20 @@ def initialize():
     optional.add_argument('--visualize_neighbours', '-vn', type=str2bool, default=True,
                           help='Use module for visualizing neighbours. Default: True.')
 
+
     optional.add_argument('--which_chr', '-chr', type=str2bool, default=False,
                           help='Use information about in which chromosome block is located. Default: False.')
 
+    optional.add_argument('--clustering_tree_patterns_coef', '-j', type=restricted_float, metavar='[0-1]', default=0.8,
+                          help='Coefficient (0-1) of weight of tree patterns similarity in clustering in unbalanced (copy number variation) module.'
+                               'Rest of weight will be used in distance between blocks.'
+                               'E.g. if set to 0.8 (default) distance between blocks coefficient will be set to 0.2.')
+
+    optional.add_argument('--clustering_threshold', '-c', type=restricted_float, metavar='[0-1]', default=0.025,
+                          help='Threshold for algorithm of clustering, default is 0.025.'
+                               'Can be increased for getting larger clusters or decreased for getting smaller and more grouped clusters.')
+
     clustering_proximity_percentile = 25
-    clustering_threshold = 0.025
-    clustering_j = 0.8
-    clustering_b = 0.2
 
     GRIMM_FILENAME = 'genomes_permutations.txt'
     UNIQUE_GRIMM_FILENAME = 'genomes_permutations_unique.txt'
@@ -381,15 +398,18 @@ def main():
         )
 
     global blocks_folder, output_folder, tree_file, labels_file, preprocessed_data_folder, show_branch_support, \
-        have_unique, keep_consistent, balanced_block_rate
+        have_unique, keep_consistent, balanced_block_rate, clustering_threshold, clustering_j, clustering_b
     initialize()
 
     start_time = time()
     d = vars(parser.parse_args())
     blocks_folder, output_folder, tree_file, labels_file, show_branch_support, keep_consistent, balanced_block_rate, \
-    visualize_neighbours, which_chr_flag = d['blocks_folder'], d['output'], d['tree'], d['labels'], \
-                                           d['show_branch_support'], d['keep_non_parallel'], \
-                                           d['filter_for_balanced'], d['visualize_neighbours'], d['which_chr']
+    visualize_neighbours, clustering_j, clustering_threshold, which_chr_flag = \
+         = d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support'], d['keep_non_parallel'], \
+           d['filter_for_balanced'], d['visualize_neighbours'], d['clustering_tree_patterns_coef'], \
+        d['clustering_threshold'], d['which_chr']
+
+    clustering_b = 1 - clustering_j
 
     # folders
     if blocks_folder[-1] != '/': blocks_folder += '/'
