@@ -57,7 +57,7 @@ def genome_lengths_from_block_coords(in_file):
 
     # names of chromosomes
     df_head = pd.read_csv(StringIO(''.join(head_lines)), sep='\t')
-    return {row['Description']: row['Size'] for index, row in df_head.iterrows()}
+    return {row['Description'] + '.1': row['Size'] for index, row in df_head.iterrows()}
 
 def genome_genome_lengths_from_chromosomes_lengths(chr_lengths):
     lengths = defaultdict(int)

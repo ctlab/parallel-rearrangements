@@ -27,5 +27,5 @@ def block_coords_to_infercars(in_file, out_file):
             print(f'>{block}', file=f)
             for index, row in df_block.iterrows():
                 chr_name, start, end, strand = chr_names[row['Seq_id']], row['Start'], row['End'], row['Strand']
-                print(chr_name + ':' + (f'{start}-{end}' if strand == '+' else f'{end}-{start}') + ' ' + strand, file=f)
+                print(chr_name + '.1:' + (f'{start}-{end}' if strand == '+' else f'{end}-{start}') + ' ' + strand, file=f)
             print(file=f)
