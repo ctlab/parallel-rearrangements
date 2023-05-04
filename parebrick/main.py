@@ -414,9 +414,10 @@ def main():
     unbalanced_rearrangements_stats_and_clustering()
     if len(ub_stats) != 0: unbalanced_rearrangements_output()
 
-    which_chromosome_characters()
-    which_chromosome_stats_and_clustering()
-    which_chromosome_output()
+    if which_chr_flag:
+        which_chromosome_characters()
+        which_chromosome_stats_and_clustering()
+        which_chromosome_output()
 
     if visualize_neighbours:
         neighbours_output()
