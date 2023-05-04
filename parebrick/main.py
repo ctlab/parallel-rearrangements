@@ -404,10 +404,9 @@ def main():
     start_time = time()
     d = vars(parser.parse_args())
     blocks_folder, output_folder, tree_file, labels_file, show_branch_support, keep_consistent, balanced_block_rate, \
-    visualize_neighbours, clustering_j, clustering_threshold, which_chr_flag = \
-         = d['blocks_folder'], d['output'], d['tree'], d['labels'], d['show_branch_support'], d['keep_non_parallel'], \
-           d['filter_for_balanced'], d['visualize_neighbours'], d['clustering_tree_patterns_coef'], \
-        d['clustering_threshold'], d['which_chr']
+    visualize_neighbours, clustering_j, clustering_threshold, which_chr_flag = d['blocks_folder'], d['output'], \
+           d['tree'], d['labels'], d['show_branch_support'], d['keep_non_parallel'], d['filter_for_balanced'], \
+           d['visualize_neighbours'], d['clustering_tree_patterns_coef'], d['clustering_threshold'], d['which_chr']
 
     clustering_b = 1 - clustering_j
 
