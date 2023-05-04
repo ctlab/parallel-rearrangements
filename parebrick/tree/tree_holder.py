@@ -137,7 +137,7 @@ class TreeHolder:
                 count_innovations(child, innovations, self.insertions_deltitions)
 
         color_counter = Counter(leaf_colors.values())
-        print(color_counter)
+        # print(color_counter)
 
         # get colorsets for internal nodes
         root = self.tree.get_tree_root()
