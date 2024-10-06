@@ -30,7 +30,7 @@ setup(
     package_dir={'parebrick': 'parebrick'},
     packages=['parebrick', 'parebrick.characters', 'parebrick.clustering', 'parebrick.tree', 'parebrick.utils',
               'parebrick.utils.data'],
-    python_requires='>=3.6, <4',
+    python_requires='>=3.6, <=3.8',
     install_requires=
         ['PyQt5', # for ete3 working properly
          'ete3', # phylogenetic trees
