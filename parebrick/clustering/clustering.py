@@ -25,7 +25,7 @@ def clustering(characters, stats, distance_between_blocks, max_length, threshold
     logger.info('Proximity matrix constructed')
 
     D = J * j + B * b
-    cls = AgglomerativeClustering(n_clusters=None, affinity='precomputed', linkage='average',
+    cls = AgglomerativeClustering(n_clusters=None, metric='precomputed', linkage='average',
                                   distance_threshold=threshold).fit_predict(D)
 
     logger.info('Clustring is done')
